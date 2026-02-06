@@ -1,13 +1,16 @@
 import { useMemo, useState } from "react";
 import { useOutletContext } from "react-router-dom";
+import "../ExportPage.css";
 
 function pad2(n) {
   return String(n).padStart(2, "0");
 }
+
 function monthStartYear() {
   const d = new Date();
   return { month: d.getMonth() + 1, year: d.getFullYear() };
 }
+
 function prevMonthYear(month, year) {
   const m = Number(month);
   const y = Number(year);
@@ -16,21 +19,67 @@ function prevMonthYear(month, year) {
 }
 
 const EXPORTS = [
-  { key: "expenses", title: "Expenses", desc: "Danh sách chi tiêu theo tháng" },
-  { key: "budgets", title: "Budgets", desc: "Ngân sách theo tháng" },
-  { key: "reports", title: "Finance Reports", desc: "Tổng hợp theo danh mục" },
+  {
+    key: "expenses",
+    title: "Chi Tiêu",
+    desc: "Danh sách chi tiêu theo tháng",
+    icon: "💳",
+    color: "pink"
+  },
+  {
+    key: "budgets",
+    title: "Ngân Sách",
+    desc: "Ngân sách theo tháng",
+    icon: "🎯",
+    color: "purple"
+  },
+  {
+    key: "reports",
+    title: "Báo Cáo",
+    desc: "Tổng hợp theo danh mục",
+    icon: "📊",
+    color: "blue"
+  },
 ];
 
-function TabCard({ active, title, desc, onClick }) {
+const FORMAT_OPTIONS = [
+  { value: "csv", label: "CSV", icon: "📄", desc: "Nhẹ & nhanh" },
+  { value: "xlsx", label: "Excel", icon: "📗", desc: "Đẹp & chuyên nghiệp" }
+];
+
+function ExportTypeCard({ active, type, onClick }) {
   return (
-    <button
-      type="button"
-      className={active ? "segmented__btn is-active" : "segmented__btn"}
+    <div
+      className={`exportTypeCard exportTypeCard--${type.color} ${active ? 'exportTypeCard--active' : ''}`}
       onClick={onClick}
     >
-      <div className="segmented__top">{title}</div>
-      <div className="segmented__sub">{desc}</div>
-    </button>
+      <div className="exportTypeCard__icon">{type.icon}</div>
+      <div className="exportTypeCard__content">
+        <div className="exportTypeCard__title">{type.title}</div>
+        <div className="exportTypeCard__desc">{type.desc}</div>
+      </div>
+      <div className="exportTypeCard__check">
+        {active ? "✓" : "○"}
+      </div>
+    </div>
+  );
+}
+
+function FormatOption({ active, option, onClick }) {
+  return (
+    <div
+      className={`formatOption ${active ? 'formatOption--active' : ''}`}
+      onClick={onClick}
+    >
+      <div className="formatOption__icon">{option.icon}</div>
+      <div className="formatOption__content">
+        <div className="formatOption__label">{option.label}</div>
+        <div className="formatOption__desc">{option.desc}</div>
+      </div>
+      <div className="formatOption__radio">
+        {active ? "●" : "○"}
+      </div>
+    </div>
   );
 }
 
@@ -42,31 +91,30 @@ export default function ExportPage() {
   const [format, setFormat] = useState("csv");
   const [month, setMonth] = useState(m0);
   const [year, setYear] = useState(y0);
-
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
 
-  // đọc token realtime để tránh case login xong token mới mà memo không update
   const token = localStorage.getItem("token");
-
   const canExport = !meLoading && accountType === "PREMIUM";
-  const active = EXPORTS.find((x) => x.key === type);
+  const activeType = EXPORTS.find((x) => x.key === type);
 
   const ext = format === "xlsx" ? "xlsx" : "csv";
   const filename = `${type}_${year}-${pad2(month)}.${ext}`;
   const endpoint = `/export/${type}?format=${format}&month=${month}&year=${year}`;
 
   const canExportReason = useMemo(() => {
-    if (meLoading) return "Đang tải thông tin tài khoản…";
-    if (!token) return "Bạn chưa đăng nhập (không có token).";
+    if (meLoading) return "Đang tải thông tin tài khoản...";
+    if (!token) return "Bạn chưa đăng nhập.";
     if (accountType !== "PREMIUM") return "Tính năng Export chỉ dành cho Premium.";
     return "";
   }, [meLoading, token, accountType]);
 
   async function downloadExport() {
     setError("");
+    setSuccess(false);
 
-    if (!token) return setError("Bạn chưa đăng nhập (không có token).");
+    if (!token) return setError("Bạn chưa đăng nhập.");
     if (!canExport) return setError("Tính năng Export chỉ dành cho Premium.");
 
     setDownloading(true);
@@ -90,8 +138,11 @@ export default function ExportPage() {
       a.click();
       a.remove();
       window.URL.revokeObjectURL(objectUrl);
+
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
     } catch (e) {
-      setError(e?.message || "Export failed.");
+      setError(e?.message || "Export thất bại. Vui lòng thử lại.");
     } finally {
       setDownloading(false);
     }
@@ -111,148 +162,226 @@ export default function ExportPage() {
   };
 
   return (
-    <div className="card pad-lg reportWide">
+    <div className="exportPage">
       {/* Header */}
-      <div className="row" style={{ alignItems: "flex-start" }}>
-        <div style={{ flex: 1 }}>
-          <h3 style={{ margin: 0 }}>Trích xuất dữ liệu</h3>
-          <p className="p-muted">Tải dữ liệu xuống dạng CSV hoặc Excel (XLSX) theo tháng.</p>
+      <div className="exportPage__header">
+        <div className="exportPage__headerContent">
+          <div className="dashHeader__wave">📥</div>
+          <div>
+            <h1 className="exportPage__title">Trích Xuất Dữ Liệu</h1>
+            <p className="exportPage__subtitle">
+              Tải dữ liệu xuống dạng CSV hoặc Excel theo tháng
+            </p>
+          </div>
         </div>
-
-        <div className="row">
-          <span className="tag">
-            File <span className="mono">{filename}</span>
-          </span>
-        </div>
+        {canExport && (
+          <div className="exportPage__badge exportPage__badge--premium">
+            <span>👑</span>
+            <span>Premium</span>
+          </div>
+        )}
       </div>
 
-      {!meLoading && accountType !== "PREMIUM" ? (
-        <div className="banner banner--warn" style={{ marginTop: 12 }}>
-          <div>
-            <div className="banner__title">Giới hạn gói tài khoản</div>
-            <div className="banner__sub">
-              Bạn đang ở gói <b>{accountType}</b>. Export chỉ dành cho <b>PREMIUM</b>.
+      {/* Premium Warning */}
+      {!meLoading && accountType !== "PREMIUM" && (
+        <div className="alertCard alertCard--warning">
+          <div className="alertCard__icon">⚠️</div>
+          <div className="alertCard__content">
+            <div className="alertCard__title">Nâng cấp để sử dụng</div>
+            <div className="alertCard__message">
+              Bạn đang ở gói <strong>{accountType}</strong>. Tính năng Export chỉ dành cho <strong>PREMIUM</strong>.
             </div>
           </div>
-        </div>
-      ) : null}
-
-      {error ? (
-        <div className="banner banner--danger" style={{ marginTop: 12 }}>
-          <div>
-            <div className="banner__title">Export lỗi</div>
-            <div className="banner__sub">{error}</div>
-          </div>
-        </div>
-      ) : null}
-
-      {/* Config */}
-      <div className="toolbar" style={{ marginTop: 12 }}>
-        <div className="toolbar__left">
-          <div className="toolbar__group">
-            <span className="tag">Quick</span>
-            <button className="btn btn-sm" type="button" onClick={onPickThisMonth}>
-              Tháng này
-            </button>
-            <button className="btn btn-sm" type="button" onClick={onPickPrevMonth}>
-              Tháng trước
-            </button>
-          </div>
-
-          <div className="toolbar__group">
-            <label className="label" style={{ margin: 0 }}>
-              Format
-            </label>
-            <select className="input input--sm" value={format} onChange={(e) => setFormat(e.target.value)}>
-              <option value="csv">CSV</option>
-              <option value="xlsx">Excel (XLSX)</option>
-            </select>
-
-            <label className="label" style={{ margin: 0 }}>
-              Month
-            </label>
-            <input
-              className="input input--sm"
-              type="number"
-              min={1}
-              max={12}
-              value={month}
-              onChange={(e) => setMonth(Number(e.target.value))}
-              style={{ width: 90 }}
-            />
-
-            <label className="label" style={{ margin: 0 }}>
-              Year
-            </label>
-            <input
-              className="input input--sm"
-              type="number"
-              min={2000}
-              max={2100}
-              value={year}
-              onChange={(e) => setYear(Number(e.target.value))}
-              style={{ width: 110 }}
-            />
-          </div>
-        </div>
-
-        <div className="toolbar__right">
-          <button
-            className="btn btn-primary"
-            onClick={downloadExport}
-            disabled={downloading || !canExport}
-            title={!canExport ? canExportReason : "Download file"}
-          >
-            {downloading ? "Đang export..." : "Export"}
+          <button className="alertCard__action">
+            Nâng cấp ngay →
           </button>
         </div>
-      </div>
+      )}
 
-      {/* Types */}
-      <div style={{ marginTop: 14 }}>
-        <div className="segmented">
-          {EXPORTS.map((x) => (
-            <TabCard
-              key={x.key}
-              active={type === x.key}
-              title={x.title}
-              desc={x.desc}
-              onClick={() => setType(x.key)}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Preview / info */}
-      <div className="cards3" style={{ marginTop: 14 }}>
-        <div className="mini">
-          <div className="mini__label">Loại dữ liệu</div>
-          <div className="mini__value">{active?.title}</div>
-          <div className="mini__hint">{active?.desc}</div>
-        </div>
-
-        <div className="mini">
-          <div className="mini__label">Thời gian</div>
-          <div className="mini__value mono">
-            {pad2(Number(month))}/{year}
+      {/* Error Alert */}
+      {error && (
+        <div className="alertCard alertCard--error">
+          <div className="alertCard__icon">❌</div>
+          <div className="alertCard__content">
+            <div className="alertCard__title">Export thất bại</div>
+            <div className="alertCard__message">{error}</div>
           </div>
-          <div className="mini__hint">Dữ liệu lọc theo tháng</div>
+          <button className="alertCard__close" onClick={() => setError("")}>
+            ×
+          </button>
         </div>
+      )}
 
-        <div className="mini">
-          <div className="mini__label">Endpoint</div>
-          <div className="mini__value mono" style={{ fontSize: 13 }}>
-            {endpoint}
+      {/* Success Alert */}
+      {success && (
+        <div className="alertCard alertCard--success">
+          <div className="alertCard__icon">✅</div>
+          <div className="alertCard__content">
+            <div className="alertCard__title">Export thành công!</div>
+            <div className="alertCard__message">File đã được tải xuống: {filename}</div>
           </div>
-          <div className="mini__hint">API route đang gọi</div>
         </div>
-      </div>
+      )}
 
-      <div className="banner" style={{ marginTop: 14 }}>
-        <div>
-          <div className="banner__title">Mẹo</div>
-          <div className="banner__sub">
-            CSV nhẹ và nhanh. XLSX đẹp khi mở Excel và dễ nộp bài (kiểm tra font tiếng Việt).
+      {/* Main Content */}
+      <div className="exportPage__content">
+        {/* Step 1: Choose Data Type */}
+        <section className="exportSection">
+          <div className="exportSection__header">
+            <div className="exportSection__number">1</div>
+            <div className="exportSection__title">Chọn loại dữ liệu</div>
+          </div>
+          <div className="exportTypeGrid">
+            {EXPORTS.map((exp) => (
+              <ExportTypeCard
+                key={exp.key}
+                active={type === exp.key}
+                type={exp}
+                onClick={() => setType(exp.key)}
+              />
+            ))}
+          </div>
+        </section>
+
+        {/* Step 2: Choose Format */}
+        <section className="exportSection">
+          <div className="exportSection__header">
+            <div className="exportSection__number">2</div>
+            <div className="exportSection__title">Chọn định dạng</div>
+          </div>
+          <div className="formatGrid">
+            {FORMAT_OPTIONS.map((opt) => (
+              <FormatOption
+                key={opt.value}
+                active={format === opt.value}
+                option={opt}
+                onClick={() => setFormat(opt.value)}
+              />
+            ))}
+          </div>
+        </section>
+
+        {/* Step 3: Choose Period */}
+        <section className="exportSection">
+          <div className="exportSection__header">
+            <div className="exportSection__number">3</div>
+            <div className="exportSection__title">Chọn thời gian</div>
+          </div>
+
+          <div className="periodSelector">
+            {/* Quick Select */}
+            <div className="quickSelect">
+              <div className="quickSelect__label">Chọn nhanh:</div>
+              <button
+                className="quickSelect__btn"
+                onClick={onPickThisMonth}
+              >
+                <span>📅</span>
+                <span>Tháng này</span>
+              </button>
+              <button
+                className="quickSelect__btn"
+                onClick={onPickPrevMonth}
+              >
+                <span>◀️</span>
+                <span>Tháng trước</span>
+              </button>
+            </div>
+
+            {/* Custom Select */}
+            <div className="customSelect">
+              <div className="inputGroup">
+                <label className="inputGroup__label">Tháng</label>
+                <select
+                  className="inputGroup__select"
+                  value={month}
+                  onChange={(e) => setMonth(Number(e.target.value))}
+                >
+                  {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                    <option key={m} value={m}>
+                      Tháng {m}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="inputGroup">
+                <label className="inputGroup__label">Năm</label>
+                <select
+                  className="inputGroup__select"
+                  value={year}
+                  onChange={(e) => setYear(Number(e.target.value))}
+                >
+                  {Array.from({ length: 5 }, (_, i) => y0 - i).map((y) => (
+                    <option key={y} value={y}>
+                      {y}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Summary & Export */}
+        <section className="exportSummary">
+          <div className="summaryCard">
+            <div className="summaryCard__header">
+              <div className="summaryCard__title">📦 Thông tin export</div>
+            </div>
+            <div className="summaryCard__content">
+              <div className="summaryItem">
+                <div className="summaryItem__label">Loại dữ liệu</div>
+                <div className="summaryItem__value">
+                  {activeType?.icon} {activeType?.title}
+                </div>
+              </div>
+              <div className="summaryItem">
+                <div className="summaryItem__label">Định dạng</div>
+                <div className="summaryItem__value">
+                  {FORMAT_OPTIONS.find(f => f.value === format)?.icon} {format.toUpperCase()}
+                </div>
+              </div>
+              <div className="summaryItem">
+                <div className="summaryItem__label">Thời gian</div>
+                <div className="summaryItem__value">
+                  {pad2(month)}/{year}
+                </div>
+              </div>
+              <div className="summaryItem">
+                <div className="summaryItem__label">Tên file</div>
+                <div className="summaryItem__value summaryItem__value--filename">
+                  {filename}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button
+            className="exportBtn"
+            onClick={downloadExport}
+            disabled={downloading || !canExport}
+            title={!canExport ? canExportReason : "Tải xuống file"}
+          >
+            <span className="exportBtn__icon">
+              {downloading ? "⏳" : "⬇️"}
+            </span>
+            <span className="exportBtn__text">
+              {downloading ? "Đang export..." : "Export ngay"}
+            </span>
+          </button>
+        </section>
+
+        {/* Tips */}
+        <div className="tipsCard">
+          <div className="tipsCard__icon">💡</div>
+          <div className="tipsCard__content">
+            <div className="tipsCard__title">Mẹo sử dụng</div>
+            <ul className="tipsCard__list">
+              <li><strong>CSV:</strong> Nhẹ, nhanh, phù hợp để import vào hệ thống khác</li>
+              <li><strong>Excel:</strong> Đẹp, chuyên nghiệp, dễ xem và chia sẻ</li>
+              <li>Kiểm tra font tiếng Việt khi mở file để hiển thị đúng</li>
+            </ul>
           </div>
         </div>
       </div>

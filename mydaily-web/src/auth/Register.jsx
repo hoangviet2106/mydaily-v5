@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import "../Login.css"; // ✅ dùng chung CSS với Login
 
 export default function Register() {
-  const [name, setName] = useState("Test User");
-  const [email, setEmail] = useState("testnew@test.com");
-  const [password, setPassword] = useState("123456");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -33,65 +34,83 @@ export default function Register() {
   };
 
   return (
-    <div className="page">
-      <div className="card pad-lg login-box" style={{ width: "100%", maxWidth: 520 }}>
-        <div style={{ marginBottom: 14 }}>
-          <h1 className="h1">Tạo tài khoản</h1>
-          <p className="p-muted">Bắt đầu quản lý công việc và chi tiêu ngay hôm nay.</p>
+    <div className="auth">
+      <div className="auth__bg" aria-hidden="true" />
+      <div className="auth__wrap">
+        <div className="authCard">
+          <div className="authCard__head" style={{ marginTop: 0 }}>
+            <h1 className="authCard__title">Tạo tài khoản</h1>
+            <p className="authCard__sub">
+              Bắt đầu quản lý công việc và chi tiêu ngay hôm nay.
+            </p>
+          </div>
+
+          <form className="authForm" onSubmit={handleSubmit}>
+            <div className="field">
+              <label className="label">Tên</label>
+              <div className="inputWrap">
+                <span className="inputIcon" aria-hidden="true">👤</span>
+                <input
+                  className="input input--pretty"
+                  placeholder="Tên bạn"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  autoComplete="name"
+                />
+              </div>
+            </div>
+
+            <div className="field">
+              <label className="label">Email</label>
+              <div className="inputWrap">
+                <span className="inputIcon" aria-hidden="true">✉️</span>
+                <input
+                  className="input input--pretty"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
+                />
+              </div>
+            </div>
+
+            <div className="field">
+              <label className="label">Mật khẩu</label>
+              <div className="inputWrap">
+                <span className="inputIcon" aria-hidden="true">🔒</span>
+                <input
+                  className="input input--pretty"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="new-password"
+                />
+              </div>
+            </div>
+
+            <div className="actions">
+              <button className="btnPrimary" type="submit" disabled={loading}>
+                <span className="btnPrimary__shine" aria-hidden="true" />
+                {loading ? "Creating..." : "Tạo tài khoản"}
+              </button>
+
+              {error && <div className="alertPretty">{error}</div>}
+
+              <p className="foot">
+                Bạn đã có tài khoản?{" "}
+                <Link className="linkStrong" to="/login">
+                  Đăng nhập
+                </Link>
+              </p>
+            </div>
+          </form>
+
+          <div className="authCard__hint">
+            <span className="dot" aria-hidden="true" />
+            Tip: đặt mật khẩu đủ mạnh để bảo vệ ví tiền & lịch làm việc.
+          </div>
         </div>
-
-        <div style={{ height: 1, background: "rgba(227,233,231,0.9)", margin: "16px 0" }} />
-
-        <form className="form" onSubmit={handleSubmit}>
-          <div className="field">
-            <label className="label">Tên</label>
-            <input
-              className="input"
-              placeholder="Your name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              autoComplete="name"
-            />
-          </div>
-
-          <div className="field">
-            <label className="label">Email</label>
-            <input
-              className="input"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="email"
-            />
-          </div>
-
-          <div className="field">
-            <label className="label">Mật Khẩu</label>
-            <input
-              className="input"
-              type="password"
-              placeholder="Minimum 6 characters"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="new-password"
-            />
-          </div>
-
-          <div className="field">
-            <button className="btn btn-primary btn-block" type="submit" disabled={loading}>
-              {loading ? "Creating..." : "Tạo Tài Khoản"}
-            </button>
-          </div>
-
-          {error && <div className="alert">{error}</div>}
-
-          <p className="p-muted" style={{ marginTop: 12 }}>
-            Bạn đã có tài khoản?{" "}
-            <Link to="/login" style={{ color: "var(--primary-dark)", fontWeight: 700 }}>
-              Đăng nhập
-            </Link>
-          </p>
-        </form>
       </div>
     </div>
   );

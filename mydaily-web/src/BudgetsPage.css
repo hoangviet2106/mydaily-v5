@@ -1,0 +1,614 @@
+/* ============================
+   BUDGETS PAGE — full-bleed, lively
+   Match DashboardHome vibe
+   ============================ */
+
+.budPage {
+    width: 100%;
+    min-height: 100vh;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.budContainer {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px 44px;
+}
+
+/* HERO */
+.budHero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 8px 0 12px;
+    flex-wrap: wrap;
+}
+
+.budHero__title {
+    font-size: 34px;
+    font-weight: 900;
+    color: white;
+    letter-spacing: -0.3px;
+}
+
+.budHero__grad {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.budHero__sub {
+    margin-top: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.62);
+    max-width: 760px;
+    line-height: 1.6;
+}
+
+.budHero__chips {
+    margin-top: 12px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.budHero__right {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+/* Pills */
+.budPill {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.budPill--ok {
+    border-color: rgba(34, 197, 94, 0.35);
+    background: rgba(34, 197, 94, 0.12);
+    color: #22c55e;
+}
+
+.budPill--warn {
+    border-color: rgba(251, 146, 60, 0.40);
+    background: rgba(251, 146, 60, 0.14);
+    color: #fb923c;
+}
+
+.budPill--danger {
+    border-color: rgba(239, 68, 68, 0.40);
+    background: rgba(239, 68, 68, 0.14);
+    color: #ef4444;
+}
+
+.budPill--neutral {
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+/* Buttons: relies on your global .btn but adds fallbacks */
+.btn.btn--primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.35);
+}
+
+.btn.btn--primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(102, 126, 234, 0.45);
+}
+
+.btn.btn--secondary {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.90);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.btn.btn--secondary:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
+}
+
+/* Alerts */
+.budAlert {
+    margin-top: 10px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    font-weight: 700;
+}
+
+.budAlert--danger {
+    background: rgba(239, 68, 68, 0.10);
+    border: 1px solid rgba(239, 68, 68, 0.30);
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.budMono {
+    font-variant-numeric: tabular-nums;
+}
+
+.budStrong {
+    font-weight: 900;
+}
+
+.budMuted {
+    color: rgba(255, 255, 255, 0.62);
+    font-weight: 600;
+}
+
+/* Editor bar */
+.budEditor {
+    margin-top: 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 20px;
+    padding: 14px;
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
+.budEditor__group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.budEditor__group--grow {
+    flex: 1;
+    min-width: 320px;
+}
+
+.budLabel {
+    font-size: 12px;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.70);
+    text-transform: uppercase;
+    letter-spacing: .4px;
+}
+
+.budInput {
+    height: 44px;
+    padding: 0 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.90);
+    outline: none;
+    transition: all .25s ease;
+    min-width: 140px;
+}
+.budInput {
+    color-scheme: dark;
+    /* ✅ quan trọng: ép UI dropdown theo dark mode */
+}
+/* Màu chữ + nền của option */
+.budInput option {
+    background: #0f1220;
+    color: rgba(255, 255, 255, .92);
+}
+
+.budInput:focus {
+    border-color: rgba(102, 126, 234, 0.55);
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.16);
+}
+
+/* Banner */
+.budBanner {
+    margin-top: 14px;
+    border-radius: 20px;
+    padding: 16px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.budBanner__title {
+    font-size: 16px;
+    font-weight: 900;
+    color: white;
+}
+
+.budBanner__sub {
+    margin-top: 6px;
+    font-size: 13px;
+    font-weight: 650;
+    color: rgba(255, 255, 255, 0.62);
+    line-height: 1.5;
+}
+
+.budBanner--ok {
+    border-color: rgba(34, 197, 94, 0.25);
+    background: rgba(34, 197, 94, 0.08);
+}
+
+.budBanner--warn {
+    border-color: rgba(251, 146, 60, 0.30);
+    background: rgba(251, 146, 60, 0.10);
+}
+
+.budBanner--danger {
+    border-color: rgba(239, 68, 68, 0.28);
+    background: rgba(239, 68, 68, 0.10);
+}
+
+.budBanner--neutral {
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* KPI grid + panel */
+.budGrid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(240px, 1fr));
+    gap: 18px;
+    margin-top: 18px;
+}
+
+.budCard {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 20px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.budCard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.30);
+    border-color: rgba(255, 255, 255, 0.20);
+}
+
+.budCard::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    opacity: .35;
+}
+
+.budCard--purple::before {
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.35) 0%, transparent 70%);
+}
+
+.budCard--blue::before {
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.35) 0%, transparent 70%);
+}
+
+.budCard--green::before {
+    background: radial-gradient(circle, rgba(34, 197, 94, 0.30) 0%, transparent 70%);
+}
+
+.budCard__label {
+    position: relative;
+    z-index: 1;
+    font-size: 13px;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.62);
+    text-transform: uppercase;
+    letter-spacing: .4px;
+}
+
+.budCard__value {
+    position: relative;
+    z-index: 1;
+    margin-top: 10px;
+    font-size: 34px;
+    font-weight: 900;
+    color: white;
+    line-height: 1.1;
+}
+
+.budUnit {
+    font-size: 13px;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.55);
+    margin-left: 6px;
+}
+
+.budCard__hint {
+    position: relative;
+    z-index: 1;
+    margin-top: 10px;
+    font-size: 13px;
+    font-weight: 650;
+    color: rgba(255, 255, 255, 0.60);
+}
+
+/* Panel spans full row */
+.budPanel {
+    grid-column: 1 / -1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 20px;
+    padding: 18px;
+    overflow: hidden;
+    position: relative;
+}
+
+.budPanel::before {
+    content: "";
+    position: absolute;
+    top: -40%;
+    left: -30%;
+    width: 360px;
+    height: 360px;
+    background: radial-gradient(circle, rgba(102, 126, 234, 0.22) 0%, transparent 70%);
+    opacity: .7;
+}
+
+.budPanel__head {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.budPanel__title {
+    font-size: 18px;
+    font-weight: 900;
+    color: white;
+}
+
+.budPanel__content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Ring */
+.budRing {
+    width: 150px;
+    height: 150px;
+    position: relative;
+    flex: 0 0 auto;
+}
+
+.budRing__track {
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background:
+        conic-gradient(rgba(102, 126, 234, 0.95) var(--p),
+            rgba(255, 255, 255, 0.10) 0);
+    filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.25));
+}
+
+.budRing__inner {
+    position: absolute;
+    inset: 10px;
+    border-radius: 999px;
+    background: rgba(16, 17, 34, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+}
+
+.budRing__value {
+    font-size: 30px;
+    font-weight: 900;
+    color: white;
+}
+
+.budRing__label {
+    font-size: 12px;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.62);
+    text-transform: uppercase;
+    letter-spacing: .4px;
+}
+
+/* Tips */
+.budTips {
+    flex: 1;
+    min-width: 260px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 16px;
+    padding: 14px;
+}
+
+.budTips__title {
+    font-size: 14px;
+    font-weight: 900;
+    color: white;
+    margin-bottom: 8px;
+}
+
+.budTips__list {
+    margin: 0;
+    padding-left: 18px;
+    color: rgba(255, 255, 255, 0.62);
+    font-weight: 650;
+    line-height: 1.6;
+}
+
+/* Bar */
+.budBar {
+    position: relative;
+    z-index: 1;
+    margin-top: 14px;
+}
+
+.budBar__track {
+    height: 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    overflow: hidden;
+}
+
+.budBar__fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    transition: width .45s ease;
+}
+
+.budBar__labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.55);
+}
+
+/* Table card */
+.budTableCard {
+    margin-top: 18px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 20px;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+}
+
+.budTableCard__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.budTableCard__title {
+    font-size: 18px;
+    font-weight: 900;
+    color: white;
+}
+
+.budTableCard__sub {
+    margin-top: 6px;
+    font-size: 13px;
+    font-weight: 650;
+    color: rgba(255, 255, 255, 0.60);
+}
+
+.budTableCard__meta {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.budTableWrap {
+    overflow: auto;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.budTable {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 860px;
+}
+
+.budTable thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: rgba(16, 17, 34, 0.92);
+    color: rgba(255, 255, 255, 0.72);
+    padding: 12px 14px;
+    font-size: 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.budTable tbody td {
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.86);
+}
+
+.budTable tbody tr:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+/* Loading */
+.budLoading {
+    margin-top: 14px;
+}
+
+.budLoading__grid {
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .budGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .budLoading__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .budTable {
+        min-width: 720px;
+    }
+}
+
+@media (max-width: 768px) {
+    .budContainer {
+        padding: 0 14px 40px;
+    }
+
+    .budHero__title {
+        font-size: 28px;
+    }
+}
+.dashHeader__wave {
+  display: inline-block;
+  animation: wave 1.6s ease-in-out infinite;
+  transform-origin: 70% 70%;
+}
+
+@keyframes wave {
+  0%   { transform: rotate(0deg); }
+  15%  { transform: rotate(14deg); }
+  30%  { transform: rotate(-8deg); }
+  45%  { transform: rotate(14deg); }
+  60%  { transform: rotate(-4deg); }
+  75%  { transform: rotate(8deg); }
+  100% { transform: rotate(0deg); }
+}

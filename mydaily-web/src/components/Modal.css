@@ -1,0 +1,190 @@
+/* ============================
+   MyDaily Glass Modal (Genz)
+   ============================ */
+
+.mdModal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+
+    display: grid;
+    place-items: center;
+
+    padding: 18px;
+
+    background: radial-gradient(1200px 700px at 50% 0%,
+            rgba(102, 126, 234, 0.22),
+            transparent 60%),
+        rgba(3, 6, 20, 0.70);
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    animation: mdModalFade 160ms ease-out;
+}
+
+@keyframes mdModalFade {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.mdModal__panel {
+    width: min(720px, calc(100vw - 32px));
+    max-height: min(78vh, 720px);
+
+    background: rgba(18, 20, 38, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 22px;
+
+    box-shadow:
+        0 34px 110px rgba(0, 0, 0, 0.62),
+        0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+
+    overflow: hidden;
+    outline: none;
+
+    transform: translateY(8px) scale(0.985);
+    animation: mdModalPop 180ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes mdModalPop {
+    to {
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Header */
+.mdModal__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    padding: 14px 16px;
+
+    background: linear-gradient(180deg,
+            rgba(255, 255, 255, 0.06),
+            rgba(255, 255, 255, 0.02));
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.mdModal__title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    font-size: 15px;
+    font-weight: 900;
+    letter-spacing: -0.2px;
+    color: rgba(255, 255, 255, 0.92);
+}
+
+.mdModal__spark {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+
+    background: radial-gradient(circle at 30% 30%,
+            rgba(240, 147, 251, 1),
+            rgba(102, 126, 234, 1));
+    box-shadow:
+        0 0 0 4px rgba(102, 126, 234, 0.14),
+        0 10px 30px rgba(102, 126, 234, 0.25);
+}
+
+/* Close */
+.mdModal__close {
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+
+    display: grid;
+    place-items: center;
+
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.86);
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.mdModal__close:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.10);
+    border-color: rgba(255, 255, 255, 0.20);
+}
+
+.mdModal__close:active {
+    transform: translateY(0);
+}
+
+/* Body */
+.mdModal__body {
+    padding: 16px;
+    overflow: auto;
+    max-height: calc(78vh - 64px);
+
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+}
+
+.mdModal__body::-webkit-scrollbar {
+    width: 10px;
+}
+
+.mdModal__body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+
+/* Footer */
+.mdModal__foot {
+    padding: 14px 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.10);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* Form elements inside modal (auto nice) */
+.mdModal input,
+.mdModal select,
+.mdModal textarea {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.92);
+    border-radius: 14px;
+}
+
+.mdModal input:focus,
+.mdModal select:focus,
+.mdModal textarea:focus {
+    outline: none;
+    border-color: rgba(102, 126, 234, 0.55);
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.16);
+}
+
+.mdModal input::placeholder,
+.mdModal textarea::placeholder {
+    color: rgba(255, 255, 255, 0.45);
+}
+
+/* Mobile */
+@media (max-width: 520px) {
+    .mdModal__panel {
+        width: calc(100vw - 24px);
+        max-height: 82vh;
+        border-radius: 18px;
+    }
+
+    .mdModal__body {
+        padding: 14px;
+    }
+}

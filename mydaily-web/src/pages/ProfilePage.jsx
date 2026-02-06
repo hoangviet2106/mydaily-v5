@@ -1,11 +1,25 @@
 import { useEffect, useMemo, useState } from "react";
 import api from "../api/axios";
+import { AppIcon } from "../icons";
+import "../ProfilePage.css";
 
 function fmtDateTime(d) {
   if (!d) return "—";
   const x = new Date(d);
   if (Number.isNaN(x.getTime())) return "—";
   return x.toLocaleString("vi-VN");
+}
+
+function PlanPill({ accountType }) {
+  const premium = accountType === "PREMIUM";
+  return (
+    <span className={`pfPlan ${premium ? "pfPlan--premium" : "pfPlan--free"}`}>
+      <span className="pfPlan__dot" />
+      <span className="pfPlan__text">{premium ? "Premium" : "Free"}</span>
+      {/* giữ emoji cho “nổi bật” */}
+      {premium ? <span className="pfPlan__icon">👑</span> : <span className="pfPlan__icon">🚀</span>}
+    </span>
+  );
 }
 
 export default function ProfilePage() {
@@ -33,18 +47,12 @@ export default function ProfilePage() {
     setErr("");
     setOk("");
     try {
-      // backend của bạn: GET /users/me -> { user }
       const res = await api.get("/users/me");
       const user = res.data?.user ?? res.data ?? null;
       setMe(user);
       setName(user?.name || "");
     } catch (e) {
-      setErr(
-        e?.response?.data?.message ||
-        e?.response?.data?.error ||
-        e?.message ||
-        "Failed to load profile."
-      );
+      setErr(e?.response?.data?.message || e?.response?.data?.error || e?.message || "Failed to load profile.");
     } finally {
       setLoading(false);
     }
@@ -65,122 +73,190 @@ export default function ProfilePage() {
 
     setSaving(true);
     try {
-      // IMPORTANT: bạn cần tạo endpoint update name (mình ghi theo chuẩn)
-      // PATCH /users/me { name }
       const res = await api.patch("/users/me", { name: v });
-
       const user = res.data?.user ?? res.data ?? null;
       setMe(user || { ...me, name: v });
       setName((user?.name ?? v) || v);
       setOk("Đã lưu thay đổi.");
     } catch (e) {
-      setErr(
-        e?.response?.data?.message ||
-        e?.response?.data?.error ||
-        e?.message ||
-        "Save failed."
-      );
+      setErr(e?.response?.data?.message || e?.response?.data?.error || e?.message || "Save failed.");
     } finally {
       setSaving(false);
     }
   };
 
+  const premium = accountType === "PREMIUM";
+
   return (
-    <div className="container reportWide">
-      {/* Header */}
-      <div className="topbar">
-        <div>
-          <div className="h1">Thông tin cá nhân</div>
-          <div className="p-muted">Xem và chỉnh sửa thông tin tài khoản.</div>
+    <div className="pfPage">
+      <div className="pfContainer">
+        {/* HERO */}
+        <div className="pfHero">
+          <div className="pfHero__left">
+            <div className="pfHero__kicker">
+              <AppIcon name="user" size={16} tone="neutral" /> Profile
+            </div>
+
+            <div className="pfHero__title">
+              Thông tin <span className="pfHero__grad">cá nhân</span>
+            </div>
+
+            <div className="pfHero__sub">
+              Xem gói tài khoản, thông tin đăng nhập và cập nhật tên hiển thị để cá nhân hóa trải nghiệm.
+            </div>
+
+            <div className="pfHero__chips">
+              <PlanPill accountType={accountType} />
+
+              <span className="pfChip">
+                <AppIcon name="clock" size={16} tone="neutral" />{" "}
+                {me ? fmtDateTime(me.created_at || me.createdAt) : "—"}
+              </span>
+
+              <span className="pfChip pfChip--soft">
+                <AppIcon name="mail" size={16} tone="blue" /> {me?.email || "—"}
+              </span>
+            </div>
+          </div>
+
+          <div className="pfHero__right">
+            <button className="btn btn--secondary" type="button" onClick={load} disabled={loading}>
+              <AppIcon name="reload" size={16} tone="neutral" /> {loading ? "Đang tải..." : "Tải lại"}
+            </button>
+
+            <button className="btn btn--primary" type="button" onClick={onSave} disabled={saving || loading || !me}>
+              <AppIcon name="save" size={16} tone={premium ? "premium" : "purple"} />{" "}
+              {saving ? "Đang lưu..." : "Lưu thay đổi"}
+            </button>
+          </div>
         </div>
 
-        <div className="toolbar__right">
-          <button className="btn" type="button" onClick={load} disabled={loading}>
-            {loading ? "Đang tải..." : "Tải lại"}
-          </button>
-        </div>
+        {/* Messages */}
+        {err ? (
+          <div className="pfAlert pfAlert--danger">
+            <AppIcon name="warning" size={16} tone="danger" /> {err}
+          </div>
+        ) : null}
+
+        {ok ? (
+          <div className="pfAlert pfAlert--ok">
+            <AppIcon name="check" size={16} tone="ok" /> {ok}
+          </div>
+        ) : null}
+
+        {loading ? (
+          <div className="pfSkeleton">
+            <div className="pfSkeleton__card" />
+            <div className="pfSkeleton__grid">
+              <div className="pfSkeleton__mini" />
+              <div className="pfSkeleton__mini" />
+              <div className="pfSkeleton__mini" />
+            </div>
+          </div>
+        ) : !me ? (
+          <div className="pfEmpty">
+            <div className="pfEmpty__title">Không tải được profile</div>
+            <div className="pfEmpty__sub">Hãy thử “Tải lại” hoặc đăng nhập lại.</div>
+            <button className="btn btn--primary" type="button" onClick={load}>
+              <AppIcon name="reload" size={16} tone="neutral" /> Tải lại
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Quick stats */}
+            <div className="pfStats">
+              <div className="pfStatCard pfStatCard--purple">
+                <div className="pfStatCard__label">
+                  <AppIcon name="crown" size={16} tone={premium ? "premium" : "muted"} /> Loại tài khoản
+                </div>
+                <div className="pfStatCard__value">
+                  <PlanPill accountType={accountType} />
+                </div>
+                <div className="pfStatCard__hint">Gói hiện tại</div>
+              </div>
+
+              <div className="pfStatCard pfStatCard--blue">
+                <div className="pfStatCard__label">
+                  <AppIcon name="mail" size={16} tone="blue" /> Email
+                </div>
+                <div className="pfStatCard__value pfMono">{me.email || "—"}</div>
+                <div className="pfStatCard__hint">Email đăng nhập</div>
+              </div>
+
+              <div className="pfStatCard pfStatCard--green">
+                <div className="pfStatCard__label">
+                  <AppIcon name="calendar" size={16} tone="green" /> Ngày tạo
+                </div>
+                <div className="pfStatCard__value pfMono">{fmtDateTime(me.created_at || me.createdAt)}</div>
+                <div className="pfStatCard__hint">Thời điểm tạo tài khoản</div>
+              </div>
+            </div>
+
+            {/* Editor */}
+            <div className="pfCard">
+              <div className="pfCard__head">
+                <div>
+                  <div className="pfCard__title">
+                    <AppIcon name="sparkles" size={18} tone="pink" /> Thông tin hiển thị
+                  </div>
+                  <div className="pfCard__sub">Tên này sẽ hiển thị ở phần “Xin chào …” trên Dashboard.</div>
+                </div>
+              </div>
+
+              <div className="pfGrid2">
+                <div className="pfField">
+                  <label className="pfLabel">Tên hiển thị</label>
+
+                  <div className="pfInputWrap">
+                    <span className="pfInputIcon">
+                      <AppIcon name="edit" size={18} tone="purple" />
+                    </span>
+
+                    <input
+                      className="pfInput"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Ví dụ: Việt Hoàng, Andrea, ..."
+                    />
+                  </div>
+
+                  <div className="pfHint">Gợi ý: tên ngắn, dễ đọc (2–100 ký tự).</div>
+                </div>
+
+                <div className="pfField">
+                  <label className="pfLabel">Email (readonly)</label>
+
+                  <div className="pfInputWrap pfInputWrap--readonly">
+                    <span className="pfInputIcon">
+                      <AppIcon name="mail" size={18} tone="blue" />
+                    </span>
+
+                    <input className="pfInput" value={me.email || ""} readOnly />
+                  </div>
+
+                  <div className="pfHint">Email là định danh đăng nhập, không thay đổi ở đây.</div>
+                </div>
+              </div>
+
+              <div className="pfCard__foot">
+                <button
+                  className="btn btn--secondary"
+                  type="button"
+                  onClick={() => setName(me?.name || "")}
+                  disabled={saving}
+                >
+                  <AppIcon name="undo" size={16} tone="muted" /> Hoàn tác
+                </button>
+
+                <button className="btn btn--primary" type="button" onClick={onSave} disabled={saving}>
+                  <AppIcon name="save" size={16} tone={premium ? "premium" : "purple"} />{" "}
+                  {saving ? "Đang lưu..." : "Lưu thay đổi"}
+                </button>
+              </div>
+            </div>
+          </>
+        )}
       </div>
-
-      {err ? <div className="alert">{err}</div> : null}
-      {ok ? <div className="banner banner--ok">{ok}</div> : null}
-
-      {loading ? (
-        <div className="skeleton">Loading profile…</div>
-      ) : !me ? (
-        <div className="empty" style={{ marginTop: 12 }}>
-          <div>
-            <div className="empty__title">Không tải được profile</div>
-            <div className="empty__subtitle">Hãy thử “Tải lại” hoặc đăng nhập lại.</div>
-          </div>
-        </div>
-      ) : (
-        <>
-          {/* Summary cards (đồng nhất kiểu cards3) */}
-          <div className="cards3" style={{ marginTop: 12 }}>
-            <div className="mini">
-              <div className="mini__label">Loại tài khoản</div>
-              <div
-                className={`planBadge ${accountType === "PREMIUM" ? "planBadge--premium" : "planBadge--free"
-                  }`}
-                style={{ marginTop: 6 }}
-              >
-                <span className="planBadge__dot" />
-                <span className="planBadge__text">
-                  {accountType === "PREMIUM" ? "Premium Plan" : "Free Plan"}
-                </span>
-                {accountType === "PREMIUM" && <span className="planBadge__icon">👑</span>}
-              </div>
-              <div className="mini__hint">Gói hiện tại</div>
-            </div>
-
-            <div className="mini">
-              <div className="mini__label">Email</div>
-              <div className="mini__value" style={{ fontSize: 14, fontWeight: 900 }}>
-                {me.email || "—"}
-              </div>
-              <div className="mini__hint">Email đăng nhập</div>
-            </div>
-
-            <div className="mini">
-              <div className="mini__label">Ngày tạo</div>
-              <div className="mini__value mono">{fmtDateTime(me.created_at || me.createdAt)}</div>
-              <div className="mini__hint">Ngày tạo tài khoản</div>
-            </div>
-          </div>
-
-          {/* Form card (gọn, không “quá to”) */}
-          <div className="card pad-lg" style={{ marginTop: 12 }}>
-            <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
-              <div>
-                <h3 style={{ margin: 0 }}>Thông tin hiển thị</h3>
-                {/* <div className="p-muted">Tên này sẽ hiển thị ở phần “Xin chào …” trên Dashboard.</div> */}
-              </div>
-              <button className="btn btn-primary" onClick={onSave} disabled={saving}>
-                {saving ? "Đang lưu..." : "Lưu thay đổi"}
-              </button>
-            </div>
-
-            <div style={{ marginTop: 12 }}>
-              <div className="field">
-                <label className="label">Tên hiển thị</label>
-                <input
-                  className="input"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Ví dụ: Andrea, Admin, ..."
-                />
-                <div className="hint">Gợi ý: dùng tên ngắn, dễ đọc.</div>
-              </div>
-
-              {/* Email readonly (tuỳ bạn có muốn show ở form nữa không) */}
-              <div className="field">
-                <label className="label">Email (readonly)</label>
-                <input className="input" value={me.email || ""} readOnly />
-              </div>
-            </div>
-          </div>
-        </>
-      )}
     </div>
   );
 }

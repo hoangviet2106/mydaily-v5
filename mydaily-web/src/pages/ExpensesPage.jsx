@@ -1,8 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import Modal from "../components/Modal";
-import ConfirmDialog from "../components/ConfirmDialog"; // ✅ NEW
+import ConfirmDialog from "../components/ConfirmDialog";
 import { fetchCategories } from "../api/category";
 import { createExpense, deleteExpense, fetchExpenses, updateExpense } from "../api/expenses";
+import { AppIcon } from "../icons"; // ✅ NEW
+import "../ExpensesPage.css";
 
 function pad2(n) {
   return String(n).padStart(2, "0");
@@ -17,11 +20,20 @@ function monthStartYear() {
 }
 function formatMoney(v) {
   const n = Number(v || 0);
+  if (!Number.isFinite(n)) return "0";
   return n.toLocaleString("vi-VN");
 }
 function toMonthYear(dateStr) {
   const d = new Date(dateStr);
   return { month: d.getMonth() + 1, year: d.getFullYear() };
+}
+function clamp(n, min, max) {
+  return Math.min(max, Math.max(min, n));
+}
+
+/* ======================= UI bits ======================= */
+function Pill({ tone = "neutral", children }) {
+  return <span className={`exPill exPill--${tone}`}>{children}</span>;
 }
 
 function AlertBanner({ alert }) {
@@ -32,18 +44,11 @@ function AlertBanner({ alert }) {
   const meta =
     status === "NO_BUDGET"
       ? `Chưa có budget cho ${pad2(month)}/${year}. Tổng chi: ${formatMoney(totalExpense)}`
-      : `Tháng ${pad2(month)}/${year}: ${formatMoney(totalExpense)} / ${formatMoney(
-        budgetLimit
-      )} (${percentUsed ?? 0}%)`;
+      : `Tháng ${pad2(month)}/${year}: ${formatMoney(totalExpense)} / ${formatMoney(budgetLimit)} (${percentUsed ?? 0
+      }%)`;
 
-  const cls =
-    status === "OVER"
-      ? "banner banner--danger"
-      : status === "WARNING"
-        ? "banner banner--warn"
-        : status === "OK"
-          ? "banner banner--ok"
-          : "banner";
+  const tone =
+    status === "OVER" ? "danger" : status === "WARNING" ? "warn" : status === "OK" ? "ok" : "neutral";
 
   const label =
     status === "OVER"
@@ -55,15 +60,25 @@ function AlertBanner({ alert }) {
           : "Chưa thiết lập budget";
 
   return (
-    <div className={cls}>
-      <div className="banner__left">
-        <div className="banner__title">{label}</div>
-        <div className="banner__sub">{meta}</div>
+    <div className={`exBanner exBanner--${tone}`}>
+      <div>
+        <div className="exBanner__title">{label}</div>
+        <div className="exBanner__sub">{meta}</div>
       </div>
+      <Pill tone={tone}>{tone === "danger" ? "Over" : tone === "warn" ? "Warning" : tone === "ok" ? "OK" : "Info"}</Pill>
     </div>
   );
 }
 
+function Chip({ active, onClick, children }) {
+  return (
+    <button type="button" className={active ? "exChip exChip--active" : "exChip"} onClick={onClick}>
+      {children}
+    </button>
+  );
+}
+
+/* ======================= Form ======================= */
 function ExpenseForm({ mode, categories, initialValue, submitting, onSubmit, onCancel }) {
   const [amount, setAmount] = useState(initialValue?.amount ? String(initialValue.amount) : "");
   const [expenseDate, setExpenseDate] = useState(
@@ -80,6 +95,12 @@ function ExpenseForm({ mode, categories, initialValue, submitting, onSubmit, onC
     setNote(initialValue?.note || "");
     setErr("");
   }, [initialValue]);
+
+  const preview = useMemo(() => {
+    const n = Number(amount);
+    if (!Number.isFinite(n) || n <= 0) return "—";
+    return `${formatMoney(n)} VNĐ`;
+  }, [amount]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -99,61 +120,73 @@ function ExpenseForm({ mode, categories, initialValue, submitting, onSubmit, onC
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="grid2">
-        <div className="field">
-          <label className="label">Số tiền</label>
-          <input
-            className="input"
-            inputMode="decimal"
-            placeholder="Ví dụ: 50000"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-          />
-          <div className="hint">Hiển thị: {formatMoney(amount)}</div>
+    <form onSubmit={handleSubmit} className="exForm exForm--modal">
+      {/* Amount + Date */}
+      <div className="exForm__grid2 exForm__grid2--modal">
+        <div className="exField exField--amount">
+          <label className="exLabel">Số tiền</label>
+          <div className="exAmount">
+            <span className="exAmount__prefix">VNĐ</span>
+            <input
+              className="exAmount__input"
+              inputMode="decimal"
+              placeholder="50000"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              autoFocus
+            />
+          </div>
+          <div className="exHint exHint--row">
+            <span>Preview</span>
+            <span className="exPreviewPill">{preview}</span>
+          </div>
         </div>
 
-        <div className="field">
-          <label className="label">Ngày chi</label>
+        <div className="exField">
+          <label className="exLabel">Ngày chi</label>
           <input
-            className="input"
+            className="exInput exInput--date"
             type="date"
             value={expenseDate}
             onChange={(e) => setExpenseDate(e.target.value)}
           />
+          <div className="exHint">Chọn đúng ngày phát sinh giao dịch</div>
         </div>
       </div>
 
-      <div className="field">
-        <label className="label">Loại chi tiêu</label>
-        <select className="input" value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
-          <option value="">-- Chọn loại --</option>
+      {/* Category */}
+      <div className="exField">
+        <label className="exLabel">Loại chi tiêu</label>
+        <select className="exInput exInput--select" value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
+          <option value="">— Chọn loại —</option>
           {categories.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}
             </option>
           ))}
         </select>
+        <div className="exHint">Tip: chọn loại giúp báo cáo phân tích chuẩn hơn</div>
       </div>
 
-      <div className="field">
-        <label className="label">Ghi chú (chi tiết)</label>
+      {/* Note */}
+      <div className="exField">
+        <label className="exLabel">Ghi chú (chi tiết)</label>
         <textarea
-          className="input"
-          rows={3}
-          placeholder="Ghi chú chi tiêu…"
+          className="exInput exTextarea exTextarea--modal"
+          rows={4}
+          placeholder="VD: ăn trưa, đổ xăng, mua đồ học..."
           value={note}
           onChange={(e) => setNote(e.target.value)}
         />
       </div>
 
-      {err ? <div className="alert">{err}</div> : null}
+      {err ? <div className="exAlert exAlert--danger exAlert--modal">{err}</div> : null}
 
-      <div className="row" style={{ justifyContent: "flex-end", marginTop: 14 }}>
-        <button type="button" className="btn" onClick={onCancel} disabled={submitting}>
+      <div className="exForm__actions exForm__actions--modal">
+        <button type="button" className="btn btn--secondary" onClick={onCancel} disabled={submitting}>
           Hủy
         </button>
-        <button type="submit" className="btn btn-primary" disabled={submitting}>
+        <button type="submit" className="btn btn--primary" disabled={submitting}>
           {submitting ? "Saving…" : mode === "edit" ? "Cập nhật" : "Thêm mới"}
         </button>
       </div>
@@ -161,6 +194,7 @@ function ExpenseForm({ mode, categories, initialValue, submitting, onSubmit, onC
   );
 }
 
+/* ======================= Page ======================= */
 export default function ExpensesPage() {
   const { month: nowMonth, year: nowYear } = monthStartYear();
 
@@ -185,9 +219,9 @@ export default function ExpensesPage() {
   const [editing, setEditing] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
-  // ✅ NEW: confirm delete modal
+  // confirm delete modal
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [pendingDelete, setPendingDelete] = useState(null); // expense object
+  const [pendingDelete, setPendingDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
   const catMap = useMemo(() => {
@@ -213,18 +247,17 @@ export default function ExpensesPage() {
   }, [expenses, month, year, categoryId, q, catMap]);
 
   const total = useMemo(() => filtered.reduce((s, e) => s + Number(e.amount || 0), 0), [filtered]);
+  const count = filtered.length;
 
-  const breakdown = useMemo(() => {
+  const topCats = useMemo(() => {
     const sums = new Map();
-    for (const e of filtered) {
-      sums.set(e.category_id, (sums.get(e.category_id) || 0) + Number(e.amount || 0));
-    }
+    for (const e of filtered) sums.set(e.category_id, (sums.get(e.category_id) || 0) + Number(e.amount || 0));
     const rows = [...sums.entries()]
       .map(([cid, amt]) => ({ cid, name: catMap.get(cid)?.name || "Unknown", amt }))
-      .sort((a, b) => b.amt - a.amt)
-      .slice(0, 4);
-
-    return rows;
+      .sort((a, b) => b.amt - a.amt);
+    const top = rows.slice(0, 6);
+    const max = Math.max(1, ...top.map((x) => x.amt));
+    return top.map((x) => ({ ...x, pct: clamp((x.amt / max) * 100, 0, 100) }));
   }, [filtered, catMap]);
 
   async function load() {
@@ -235,11 +268,7 @@ export default function ExpensesPage() {
       setCategories(cats || []);
       setExpenses(exps || []);
     } catch (err) {
-      const msg =
-        err?.response?.data?.message ||
-        err?.response?.data?.error ||
-        err?.message ||
-        "Failed to load expenses.";
+      const msg = err?.response?.data?.message || err?.response?.data?.error || err?.message || "Failed to load expenses.";
       setError(msg);
     } finally {
       setLoading(false);
@@ -284,20 +313,13 @@ export default function ExpensesPage() {
       }
       setOpen(false);
     } catch (err) {
-      const msg =
-        err?.response?.data?.message ||
-        err?.response?.data?.error ||
-        err?.message ||
-        "Save failed.";
+      const msg = err?.response?.data?.message || err?.response?.data?.error || err?.message || "Save failed.";
       setError(msg);
     } finally {
       setSubmitting(false);
     }
   };
 
-  /**
-   * ✅ DELETE (open confirm modal)
-   */
   const handleDelete = (exp) => {
     setPendingDelete(exp);
     setConfirmOpen(true);
@@ -320,182 +342,254 @@ export default function ExpensesPage() {
       setAlert(res.alert || null);
       closeDeleteModal();
     } catch (err) {
-      const msg =
-        err?.response?.data?.message ||
-        err?.response?.data?.error ||
-        err?.message ||
-        "Delete failed.";
+      const msg = err?.response?.data?.message || err?.response?.data?.error || err?.message || "Delete failed.";
       setError(msg);
     } finally {
       setDeleting(false);
     }
   };
 
+  const periodLabel = `${pad2(Number(month))}/${year}`;
+
   return (
-    <div className="pageWidth">
-      <div className="card pad-lg">
-        {/* Header */}
-        <div className="dashHeader">
-          <div>
-            <div className="pageTitle">Chi tiêu</div>
-            <div className="dashDate">Quản lý chi tiêu theo tháng, danh mục và ghi chú.</div>
+    <div className="exPage">
+      <div className="dashContainer exContainer">
+        {/* HERO */}
+        <div className="exHero">
+          <div className="exHero__left">
+            <div className="exHero__title">
+              {/* ✅ giữ icon nổi bật cố định */}
+              <span className="dashHeader__wave">🧾</span>{" "}
+              Chi tiêu <span className="exHero__grad">gọn gàng</span>
+            </div>
+            <div className="exHero__sub">
+              Theo dõi theo tháng/danh mục, tìm kiếm theo ghi chú, và nhận cảnh báo ngân sách ngay sau mỗi lần nhập.
+            </div>
+
+            <div className="exHero__chips">
+              <Pill tone="neutral">Period: {periodLabel}</Pill>
+              <Pill tone="neutral">Count: {count}</Pill>
+              <Pill tone="ok">Total: {formatMoney(total)} VNĐ</Pill>
+            </div>
           </div>
 
-          <div className="pageActions">
-            <button className="btn" onClick={load} disabled={loading}>
-              Tải lại trang
+          <div className="exHero__right">
+            <button className="btn btn--secondary" onClick={load} disabled={loading} type="button">
+              <AppIcon name="reload" size={18} /> Tải lại
             </button>
-            <button className="btn btn-primary" onClick={openCreate} type="button">
-              + Thêm mới chi tiêu
+
+            <Link to="/categories" className="btn btn--secondary">
+              <AppIcon name="categories" size={18} /> Danh mục
+            </Link>
+
+            <button className="btn btn--primary" onClick={openCreate} type="button">
+              <AppIcon name="addExpense" size={18} /> Thêm chi tiêu
             </button>
           </div>
         </div>
 
         <AlertBanner alert={alert} />
 
-        {error ? <div className="alert">{error}</div> : null}
+        {error ? <div className="exAlert exAlert--danger">{error}</div> : null}
 
-        <div className="toolbar">
-          <div className="toolbar__left">
-            <div className="toolbar__group">
-              <label className="label" style={{ margin: 0 }}>
-                Month
-              </label>
-              <select className="input input--sm" value={month} onChange={(e) => setMonth(e.target.value)}>
-                {Array.from({ length: 12 }).map((_, i) => {
-                  const m = i + 1;
-                  return (
-                    <option key={m} value={m}>
-                      {pad2(m)}
-                    </option>
-                  );
-                })}
-              </select>
-
-              <label className="label" style={{ margin: 0 }}>
-                Year
-              </label>
-              <input
-                className="input input--sm"
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
-                inputMode="numeric"
-                style={{ width: 110 }}
-              />
-            </div>
-
-            <div className="toolbar__group">
-              <label className="label" style={{ margin: 0 }}>
-                Loại
-              </label>
-              <select
-                className="input input--sm"
-                value={categoryId}
-                onChange={(e) => setCategoryId(e.target.value)}
-                style={{ minWidth: 200 }}
-              >
-                <option value="">Tất cả</option>
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
+        {/* FILTERS (glass bar) */}
+        <div className="exFilters">
+          <div className="exFilters__group">
+            <label className="exLabel exLabel--inline">Month</label>
+            <select className="exInput exInput--sm" value={month} onChange={(e) => setMonth(e.target.value)}>
+              {Array.from({ length: 12 }).map((_, i) => {
+                const m = i + 1;
+                return (
+                  <option key={m} value={m}>
+                    {pad2(m)}
                   </option>
-                ))}
-              </select>
+                );
+              })}
+            </select>
 
-              <input
-                className="input input--sm"
-                placeholder="Tìm kiếm..."
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                style={{ minWidth: 220 }}
-              />
-            </div>
+            <label className="exLabel exLabel--inline">Year</label>
+            <input
+              className="exInput exInput--sm"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              inputMode="numeric"
+              style={{ width: 130 }}
+            />
           </div>
 
-          <div className="toolbar__right">
-            <div className="stat">
-              <div className="stat__label">Tổng tiền</div>
-              <div className="stat__value">{formatMoney(total)} VNĐ</div>
+          <div className="exFilters__group exFilters__group--grow">
+            <label className="exLabel exLabel--inline">Loại</label>
+            <select
+              className="exInput exInput--sm"
+              value={categoryId}
+              onChange={(e) => setCategoryId(e.target.value)}
+              style={{ minWidth: 200 }}
+            >
+              <option value="">Tất cả</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+
+            <div style={{ position: "relative", flex: 1, minWidth: 260 }}>
+              <span
+                style={{
+                  position: "absolute",
+                  left: 10,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  opacity: 0.8,
+                  pointerEvents: "none",
+                }}
+              >
+                <AppIcon name="search" size={18} />
+              </span>
+              <input
+                className="exInput exInput--sm"
+                placeholder="Tìm theo ghi chú hoặc category…"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                style={{ paddingLeft: 34, width: "100%" }}
+              />
             </div>
-            <div className="stat">
-              <div className="stat__label">Số lượng</div>
-              <div className="stat__value">{filtered.length}</div>
+
+            <button
+              className="btn btn--secondary btn--sm"
+              type="button"
+              onClick={() => setQ("")}
+              disabled={!q.trim()}
+            >
+              <AppIcon name="clear" size={18} />
+            </button>
+          </div>
+
+          <div className="exFilters__meta">
+            <div className="exStat">
+              <div className="exStat__label">Tổng tiền</div>
+              <div className="exStat__value">{formatMoney(total)} VNĐ</div>
+            </div>
+            <div className="exStat">
+              <div className="exStat__label">Số lượng</div>
+              <div className="exStat__value">{count}</div>
             </div>
           </div>
         </div>
 
+        {/* BODY */}
         {loading ? (
-          <div className="skeleton">Loading expenses…</div>
-        ) : filtered.length === 0 ? (
-          <div className="empty" style={{ marginTop: 12 }}>
-            <div>
-              <div className="empty__title">Chưa có giao dịch trong tháng này</div>
-              <div className="empty__subtitle">Thử đổi Tháng/Năm, Loại chi phí hoặc tạo chi phí mới.</div>
+          <div className="exLoading">
+            <div className="skeleton skeleton--hero" />
+            <div className="exLoading__grid">
+              <div className="skeleton skeleton--card" />
+              <div className="skeleton skeleton--card" />
+              <div className="skeleton skeleton--card" />
             </div>
+          </div>
+        ) : count === 0 ? (
+          <div className="exEmpty">
+            <div className="exEmpty__title">Chưa có giao dịch trong tháng này</div>
+            <div className="exEmpty__sub">Thử đổi Tháng/Năm, Loại chi phí hoặc tạo chi phí mới.</div>
+            <button className="btn btn--primary" onClick={openCreate} type="button">
+              <AppIcon name="addExpense" size={18} /> Tạo chi tiêu đầu tiên
+            </button>
           </div>
         ) : (
           <>
-            <div className="cards3" style={{ marginTop: 14 }}>
-              <div className="mini">
-                <div className="mini__label">Tháng</div>
-                <div className="mini__value">
-                  {pad2(Number(month))}/{year}
-                </div>
+            {/* Insights */}
+            <div className="exInsights">
+              <div className="exKpi exKpi--purple">
+                <div className="exKpi__label">Kỳ đang xem</div>
+                <div className="exKpi__value">{periodLabel}</div>
+                <div className="exKpi__hint">Đổi filter ở thanh phía trên</div>
               </div>
 
-              <div className="mini">
-                <div className="mini__label">Xếp hạng</div>
-                <div className="mini__value" style={{ fontSize: 13, fontWeight: 800 }}>
-                  {breakdown.length ? (
-                    breakdown.map((x) => (
-                      <div key={x.cid} className="mini__row">
-                        <span className="tag">{x.name}</span>
-                        <span className="mono">{formatMoney(x.amt)}</span>
+              <div className="exKpi exKpi--blue">
+                <div className="exKpi__label">Top categories</div>
+                <div className="exTop">
+                  {topCats.length ? (
+                    topCats.slice(0, 4).map((x) => (
+                      <div key={x.cid} className="exTop__row">
+                        <span className="exTag">{x.name}</span>
+                        <span className="exMono">{formatMoney(x.amt)}</span>
+                        <span className="exSpark">
+                          <span className="exSpark__bar" style={{ width: `${x.pct}%` }} />
+                        </span>
                       </div>
                     ))
                   ) : (
-                    <span className="p-muted">—</span>
+                    <div className="exMuted">—</div>
                   )}
                 </div>
               </div>
 
-              <div className="mini">
-                <div className="mini__label">Quick tips</div>
-                <div className="mini__value" style={{ fontSize: 13, fontWeight: 600, color: "var(--muted)" }}>
-                  Gợi ý: tạo Budget để hệ thống cảnh báo sắp/vượt ngân sách sau mỗi lần nhập chi.
+              <div className="exKpi exKpi--green">
+                <div className="exKpi__label">Quick actions</div>
+                <div className="exQuick">
+                  <Chip active={false} onClick={() => setCategoryId("")}>
+                    All
+                  </Chip>
+                  {topCats.slice(0, 3).map((x) => (
+                    <Chip
+                      key={x.cid}
+                      active={categoryId === x.cid}
+                      onClick={() => setCategoryId(categoryId === x.cid ? "" : x.cid)}
+                    >
+                      {x.name}
+                    </Chip>
+                  ))}
                 </div>
+                <div className="exKpi__hint">Chạm để filter nhanh theo top categories</div>
               </div>
             </div>
 
-            <div className="table-scroll" style={{ marginTop: 14 }}>
-              <div className="table-wrap">
-                <table className="table table__head-sticky">
+            {/* Table */}
+            <div className="exTableCard">
+              <div className="exTableCard__head">
+                <div>
+                  <div className="exTableCard__title">
+                    {/* ✅ giữ "📒" vì nổi bật / brandy */}
+                    📒 Danh sách chi tiêu
+                  </div>
+                  <div className="exTableCard__sub">Sắp xếp theo dữ liệu backend (mặc định). Dùng search để lọc nhanh.</div>
+                </div>
+                <div className="exTableCard__meta">
+                  <Pill tone="neutral">Rows: {count}</Pill>
+                  <Pill tone="ok">Total: {formatMoney(total)} VNĐ</Pill>
+                </div>
+              </div>
+
+              <div className="exTableWrap">
+                <table className="exTable">
                   <thead>
                     <tr>
-                      <th style={{ width: 140 }}>Thời gian</th>
-                      <th style={{ width: 140 }}>Loại</th>
+                      <th style={{ width: 150 }}>Ngày</th>
+                      <th style={{ width: 180 }}>Loại</th>
                       <th>Ghi chú</th>
-                      <th style={{ width: 160, textAlign: "right" }}>Tổng tiền</th>
-                      <th style={{ width: 180, textAlign: "right" }}>Hành động</th>
+                      <th style={{ width: 180, textAlign: "right" }}>Số tiền</th>
+                      <th style={{ width: 210, textAlign: "right" }}>Hành động</th>
                     </tr>
                   </thead>
 
                   <tbody>
                     {filtered.map((e) => (
                       <tr key={e.id}>
-                        <td className="mono">{e.expense_date.slice(0, 10)}</td>
-                        <td>{catMap.get(e.category_id)?.name || "Unknown"}</td>
-                        <td className="td-muted">{e.note || "—"}</td>
-                        <td className="mono" style={{ textAlign: "right", fontWeight: 900 }}>
+                        <td className="exMono">{String(e.expense_date).slice(0, 10)}</td>
+                        <td>
+                          <span className="exTag exTag--soft">{catMap.get(e.category_id)?.name || "Unknown"}</span>
+                        </td>
+                        <td className="exMuted">{e.note || "—"}</td>
+                        <td className="exMono exStrong" style={{ textAlign: "right" }}>
                           {formatMoney(e.amount)} VNĐ
                         </td>
                         <td style={{ textAlign: "right" }}>
-                          <div className="row" style={{ justifyContent: "flex-end" }}>
-                            <button className="btn btn-sm" onClick={() => openEdit(e)} type="button">
-                              Chỉnh Sửa
+                          <div className="exRowActions">
+                            <button className="btn btn--secondary btn--sm" onClick={() => openEdit(e)} type="button">
+                              <AppIcon name="edit" size={16} /> Chỉnh sửa
                             </button>
-                            <button className="btn btn-sm btn-danger" onClick={() => handleDelete(e)} type="button">
-                              Xóa
+                            <button className="btn btn--danger btn--sm" onClick={() => handleDelete(e)} type="button">
+                              <AppIcon name="delete" size={16} /> Xóa
                             </button>
                           </div>
                         </td>
@@ -508,10 +602,10 @@ export default function ExpensesPage() {
           </>
         )}
 
-        {/* Create/Edit Modal */}
+        {/* Modal */}
         <Modal
           open={open}
-          title={mode === "edit" ? "Edit expense" : "Add expense"}
+          title={mode === "edit" ? "Chỉnh sửa chi tiêu" : "Thêm chi tiêu"}
           onClose={() => (submitting ? null : setOpen(false))}
           footer={null}
         >
@@ -525,7 +619,7 @@ export default function ExpensesPage() {
           />
         </Modal>
 
-        {/* ✅ Confirm Delete Modal */}
+        {/* Confirm Delete */}
         <ConfirmDialog
           open={confirmOpen}
           title="Xoá chi tiêu"

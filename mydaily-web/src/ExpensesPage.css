@@ -1,0 +1,1015 @@
+/* ============================
+   EXPENSES PAGE — full-bleed
+   lively / genz vibe
+   ============================ */
+
+.exPage {
+    width: 100%;
+    min-height: 100vh;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.exContainer {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px 44px;
+}
+
+/* Hero */
+.exHero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 8px 0 12px;
+    flex-wrap: wrap;
+}
+
+.exHero__title {
+    font-size: 34px;
+    font-weight: 900;
+    color: white;
+    letter-spacing: -0.3px;
+}
+
+.exHero__grad {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.exHero__sub {
+    margin-top: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.62);
+    max-width: 820px;
+    line-height: 1.6;
+}
+
+.exHero__chips {
+    margin-top: 12px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.exHero__right {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+/* Pills */
+.exPill {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.exPill--ok {
+    border-color: rgba(34, 197, 94, 0.35);
+    background: rgba(34, 197, 94, 0.12);
+    color: #22c55e;
+}
+
+.exPill--warn {
+    border-color: rgba(251, 146, 60, 0.40);
+    background: rgba(251, 146, 60, 0.14);
+    color: #fb923c;
+}
+
+.exPill--danger {
+    border-color: rgba(239, 68, 68, 0.40);
+    background: rgba(239, 68, 68, 0.14);
+    color: #ef4444;
+}
+
+.exPill--neutral {
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+/* Banners */
+.exBanner {
+    margin-top: 14px;
+    border-radius: 20px;
+    padding: 16px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.exBanner__title {
+    font-size: 16px;
+    font-weight: 900;
+    color: white;
+}
+
+.exBanner__sub {
+    margin-top: 6px;
+    font-size: 13px;
+    font-weight: 650;
+    color: rgba(255, 255, 255, 0.62);
+    line-height: 1.5;
+}
+
+.exBanner--ok {
+    border-color: rgba(34, 197, 94, 0.25);
+    background: rgba(34, 197, 94, 0.08);
+}
+
+.exBanner--warn {
+    border-color: rgba(251, 146, 60, 0.30);
+    background: rgba(251, 146, 60, 0.10);
+}
+
+.exBanner--danger {
+    border-color: rgba(239, 68, 68, 0.28);
+    background: rgba(239, 68, 68, 0.10);
+}
+
+.exBanner--neutral {
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Alerts */
+.exAlert {
+    margin-top: 10px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    font-weight: 700;
+}
+
+.exAlert--danger {
+    background: rgba(239, 68, 68, 0.10);
+    border: 1px solid rgba(239, 68, 68, 0.30);
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.exMono {
+    font-variant-numeric: tabular-nums;
+}
+
+.exStrong {
+    font-weight: 900;
+}
+
+.exMuted {
+    color: rgba(255, 255, 255, 0.62);
+    font-weight: 600;
+}
+
+/* Filters (glass bar) */
+.exFilters {
+    margin-top: 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 20px;
+    padding: 14px;
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
+.exFilters__group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.exFilters__group--grow {
+    flex: 1;
+    min-width: 340px;
+}
+
+.exFilters__meta {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-left: auto;
+}
+
+.exStat {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 16px;
+    padding: 10px 12px;
+    min-width: 150px;
+}
+
+.exStat__label {
+    font-size: 12px;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.62);
+    text-transform: uppercase;
+    letter-spacing: .4px;
+}
+
+.exStat__value {
+    margin-top: 4px;
+    font-size: 14px;
+    font-weight: 900;
+    color: white;
+}
+
+/* Inputs */
+.exLabel {
+    font-size: 12px;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.70);
+    text-transform: uppercase;
+    letter-spacing: .4px;
+}
+
+.exLabel--inline {
+    margin-right: 2px;
+}
+
+.exInput {
+    height: 44px;
+    padding: 0 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.90);
+    outline: none;
+    transition: all .25s ease;
+}
+.exInput {
+    color-scheme: dark;
+    /* ✅ quan trọng: ép UI dropdown theo dark mode */
+}
+/* Màu chữ + nền của option */
+.exInput option {
+    background: #0f1220;
+    color: rgba(255, 255, 255, .92);
+}
+
+.exInput:focus {
+    border-color: rgba(102, 126, 234, 0.55);
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.16);
+}
+
+.exInput--sm {
+    height: 40px;
+    padding: 0 12px;
+    border-radius: 12px;
+}
+
+.exTextarea {
+    height: auto;
+    padding: 12px 14px;
+    resize: vertical;
+}
+
+/* Insights grid */
+.exInsights {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(240px, 1fr));
+    gap: 18px;
+    margin-top: 18px;
+}
+
+.exKpi {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 20px;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+    transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.exKpi:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.30);
+    border-color: rgba(255, 255, 255, 0.20);
+}
+
+.exKpi::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    opacity: .35;
+}
+
+.exKpi--purple::before {
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.35) 0%, transparent 70%);
+}
+
+.exKpi--blue::before {
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.35) 0%, transparent 70%);
+}
+
+.exKpi--green::before {
+    background: radial-gradient(circle, rgba(34, 197, 94, 0.30) 0%, transparent 70%);
+}
+
+.exKpi__label {
+    position: relative;
+    z-index: 1;
+    font-size: 12px;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.62);
+    text-transform: uppercase;
+    letter-spacing: .4px;
+}
+
+.exKpi__value {
+    position: relative;
+    z-index: 1;
+    margin-top: 10px;
+    font-size: 30px;
+    font-weight: 900;
+    color: white;
+    line-height: 1.1;
+}
+
+.exKpi__hint {
+    position: relative;
+    z-index: 1;
+    margin-top: 10px;
+    font-size: 13px;
+    font-weight: 650;
+    color: rgba(255, 255, 255, 0.60);
+}
+
+/* Top list */
+.exTop {
+    position: relative;
+    z-index: 1;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.exTop__row {
+    display: grid;
+    grid-template-columns: 1fr auto 90px;
+    gap: 10px;
+    align-items: center;
+}
+
+.exTag {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 900;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.86);
+    white-space: nowrap;
+}
+
+.exTag--soft {
+    background: rgba(102, 126, 234, 0.12);
+    border-color: rgba(102, 126, 234, 0.22);
+}
+
+.exSpark {
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    overflow: hidden;
+}
+
+.exSpark__bar {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Quick chips */
+.exQuick {
+    position: relative;
+    z-index: 1;
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.exChip {
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.82);
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-weight: 900;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+.exChip:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.10);
+    border-color: rgba(255, 255, 255, 0.22);
+}
+
+.exChip--active {
+    background: rgba(102, 126, 234, 0.18);
+    border-color: rgba(102, 126, 234, 0.35);
+    color: white;
+}
+
+/* Table card */
+.exTableCard {
+    margin-top: 18px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 20px;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+}
+
+.exTableCard__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.exTableCard__title {
+    font-size: 18px;
+    font-weight: 900;
+    color: white;
+}
+
+.exTableCard__sub {
+    margin-top: 6px;
+    font-size: 13px;
+    font-weight: 650;
+    color: rgba(255, 255, 255, 0.60);
+}
+
+.exTableCard__meta {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.exTableWrap {
+    overflow: auto;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.exTable {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 920px;
+}
+
+.exTable thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: rgba(16, 17, 34, 0.92);
+    color: rgba(255, 255, 255, 0.72);
+    padding: 12px 14px;
+    font-size: 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.exTable tbody td {
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.86);
+}
+
+.exTable tbody tr:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.exRowActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Empty */
+.exEmpty {
+    margin-top: 16px;
+    padding: 22px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    text-align: center;
+}
+
+.exEmpty__title {
+    font-size: 18px;
+    font-weight: 900;
+    color: white;
+}
+
+.exEmpty__sub {
+    margin-top: 6px;
+    font-size: 13px;
+    font-weight: 650;
+    color: rgba(255, 255, 255, 0.60);
+    margin-bottom: 12px;
+}
+
+/* Loading */
+.exLoading {
+    margin-top: 14px;
+}
+
+.exLoading__grid {
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+/* Buttons fallback helpers */
+.btn.btn--primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.35);
+}
+
+.btn.btn--primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(102, 126, 234, 0.45);
+}
+
+.btn.btn--secondary {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.90);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.btn.btn--secondary:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
+}
+
+.btn.btn--danger {
+    background: rgba(239, 68, 68, 0.16);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    color: #ffb4b4;
+}
+
+.btn.btn--danger:hover {
+    background: rgba(239, 68, 68, 0.22);
+    transform: translateY(-1px);
+}
+
+.btn.btn--sm {
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+/* Form (modal content) */
+.exForm {
+    margin-top: 6px;
+}
+
+.exForm__grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.exField {
+    margin-bottom: 12px;
+}
+
+.exHint {
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.60);
+}
+
+.exForm__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+@media (max-width: 768px) {
+    .exContainer {
+        padding: 0 14px 40px;
+    }
+
+    .exHero__title {
+        font-size: 28px;
+    }
+
+    .exInsights {
+        grid-template-columns: 1fr;
+    }
+
+    .exLoading__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .exForm__grid2 {
+        grid-template-columns: 1fr;
+    }
+
+    .exTable {
+        min-width: 760px;
+    }
+}
+
+/* ============================
+   FIX MODAL WHITE -> GLASS DARK
+   Apply globally (works for many modal structures)
+   ============================ */
+
+/* Backdrop */
+.modal-overlay,
+.modalBackdrop,
+.modal__overlay,
+.modalOverlay,
+[aria-modal="true"]::backdrop {
+    background: rgba(3, 6, 20, 0.65) !important;
+    backdrop-filter: blur(8px);
+}
+
+/* Common modal containers (try hit multiple DOM patterns) */
+.modal,
+.modalDialog,
+.modalContent,
+.modal__container,
+.modal__dialog,
+.modal__panel,
+.modal-panel,
+.modal-card,
+[role="dialog"] {
+    background: rgba(18, 20, 38, 0.92) !important;
+    color: rgba(255, 255, 255, 0.92) !important;
+
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 22px !important;
+
+    box-shadow:
+        0 30px 90px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(255, 255, 255, 0.06) inset !important;
+
+    backdrop-filter: blur(10px);
+}
+
+/* If your Modal uses a wrapper element inside */
+.modal .card,
+.modal__panel .card,
+[role="dialog"] .card {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Header title */
+.modal h1,
+.modal h2,
+.modal h3,
+.modalTitle,
+.modal__title,
+[role="dialog"] .title,
+[role="dialog"] .modal-title {
+    color: white !important;
+    font-weight: 900 !important;
+    letter-spacing: -0.2px;
+}
+
+/* Divider lines inside modal */
+.modal hr,
+.modal__divider,
+[role="dialog"] hr {
+    border: none !important;
+    height: 1px !important;
+    background: rgba(255, 255, 255, 0.10) !important;
+}
+
+/* Inputs inside modal (fallback nếu chưa ăn class exInput) */
+.modal input,
+.modal select,
+.modal textarea,
+[role="dialog"] input,
+[role="dialog"] select,
+[role="dialog"] textarea {
+    background: rgba(255, 255, 255, 0.06) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    color: rgba(255, 255, 255, 0.92) !important;
+    border-radius: 14px !important;
+    outline: none !important;
+}
+
+.modal input:focus,
+.modal select:focus,
+.modal textarea:focus,
+[role="dialog"] input:focus,
+[role="dialog"] select:focus,
+[role="dialog"] textarea:focus {
+    border-color: rgba(102, 126, 234, 0.55) !important;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.16) !important;
+}
+
+/* Placeholder */
+.modal input::placeholder,
+.modal textarea::placeholder,
+[role="dialog"] input::placeholder,
+[role="dialog"] textarea::placeholder {
+    color: rgba(255, 255, 255, 0.45) !important;
+}
+
+/* Buttons in modal (fallback) */
+.modal button,
+[role="dialog"] button {
+    border-radius: 14px;
+}
+
+/* ConfirmDialog message text */
+.modal p,
+.modal .p-muted,
+[role="dialog"] p {
+    color: rgba(255, 255, 255, 0.70) !important;
+    font-weight: 600;
+}
+
+/* Small: remove default blue selection-looking header highlight if any */
+.modal *::selection,
+[role="dialog"] *::selection {
+    background: rgba(102, 126, 234, 0.35);
+}
+
+/* ===== Form inside Modal (Expenses) ===== */
+.exForm--modal {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.exForm__grid2--modal {
+    gap: 14px;
+    align-items: start;
+}
+
+/* Amount UI */
+.exAmount {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    height: 54px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.exAmount__prefix {
+    display: grid;
+    place-items: center;
+    font-weight: 900;
+    letter-spacing: .6px;
+    color: rgba(255, 255, 255, 0.75);
+    background: rgba(255, 255, 255, 0.05);
+    border-right: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.exAmount__input {
+    border: 0;
+    outline: none;
+    background: transparent;
+    padding: 0 12px;
+    font-size: 20px;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.exAmount__input::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.exHint--row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.exPreviewPill {
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 900;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Inputs */
+.exInput--date,
+.exInput--select {
+    height: 48px;
+    border-radius: 14px;
+}
+
+/* Textarea */
+.exTextarea--modal {
+    min-height: 120px;
+    border-radius: 16px;
+    padding: 10px 12px;
+}
+
+/* Alert spacing */
+.exAlert--modal {
+    border-radius: 16px;
+}
+
+/* Actions */
+.exForm__actions--modal {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+/* Mobile */
+@media (max-width: 860px) {
+    .exForm__grid2--modal {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =========================
+   Expense Modal Form polish
+   ========================= */
+.exForm--modal {
+    width: 100%;
+}
+
+/* grid 2 cột cân hơn, co giãn tốt */
+.exForm__grid2--modal {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    /* tiền rộng hơn ngày */
+    gap: 18px 18px;
+    align-items: start;
+}
+
+/* Field spacing */
+.exField {
+    margin-bottom: 14px;
+}
+
+.exLabel {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    font-weight: 700;
+    letter-spacing: .4px;
+    opacity: .92;
+    margin-bottom: 10px;
+}
+
+/* Amount group */
+.exAmount {
+    display: grid;
+    grid-template-columns: 88px 1fr;
+    align-items: stretch;
+    border-radius: 16px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, .06);
+    border: 1px solid rgba(255, 255, 255, .10);
+}
+
+.exAmount__prefix {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    opacity: .9;
+    background: rgba(255, 255, 255, .04);
+    border-right: 1px solid rgba(255, 255, 255, .10);
+}
+
+.exAmount__input {
+    width: 100%;
+    border: 0;
+    outline: none;
+    background: transparent;
+    padding: 14px 14px;
+    font-size: 22px;
+    font-weight: 800;
+    color: rgba(255, 255, 255, .95);
+}
+
+/* Inputs */
+.exInput {
+    width: 100%;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .06);
+    border: 1px solid rgba(255, 255, 255, .10);
+    color: rgba(255, 255, 255, .92);
+    padding: 12px 12px;
+    outline: none;
+}
+
+.exInput:focus,
+.exAmount:focus-within {
+    border-color: rgba(140, 120, 255, .55);
+    box-shadow: 0 0 0 4px rgba(140, 120, 255, .18);
+}
+
+.exInput--date {
+    height: 46px;
+    padding: 10px 12px;
+}
+
+/* Hint row for preview */
+.exHint--row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    gap: 10px;
+    opacity: .85;
+}
+
+.exPreviewPill {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .08);
+    border: 1px solid rgba(255, 255, 255, .10);
+    font-weight: 700;
+    font-size: 12px;
+}
+
+/* Textarea MUST be wide & comfy */
+.exTextarea--modal {
+    min-height: 160px;
+    /* 🔥 làm note "đã" hơn */
+    resize: vertical;
+    line-height: 1.5;
+}
+
+/* Actions: stick bottom + nicer spacing */
+.exForm__actions--modal {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, .08);
+}
+
+/* Make buttons consistent in modal */
+.exForm__actions--modal .btn {
+    min-height: 44px;
+    border-radius: 14px;
+    padding: 10px 16px;
+    font-weight: 800;
+}
+
+/* Dark native select dropdown (Chrome/Edge/Safari hỗ trợ tốt) */
+.exInput--select {
+    color-scheme: dark;
+    /* ✅ quan trọng: ép UI dropdown theo dark mode */
+}
+
+/* Màu chữ + nền của option */
+.exInput--select option {
+    background: #0f1220;
+    color: rgba(255, 255, 255, .92);
+}

@@ -1,0 +1,876 @@
+/* =========================================================
+   MyDaily TasksPage — GenZ Theme (scoped)
+   Works with wrapper: <div className="pageWidth tasksScope tz">
+   ========================================================= */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap");
+
+.tasksScope.tz {
+    --font-sans: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    --font-display: "Plus Jakarta Sans", Inter, system-ui, sans-serif;
+
+    --bg0: #070a12;
+    --bg1: #0b1021;
+
+    --card: rgba(255, 255, 255, 0.06);
+    --card2: rgba(255, 255, 255, 0.09);
+
+    --stroke: rgba(255, 255, 255, 0.12);
+    --stroke2: rgba(255, 255, 255, 0.18);
+
+    --text: rgba(255, 255, 255, 0.92);
+    --muted: rgba(255, 255, 255, 0.70);
+    --muted2: rgba(255, 255, 255, 0.56);
+
+    --brandA: #7c3aed;
+    /* violet */
+    --brandB: #22d3ee;
+    /* cyan */
+    --brandC: #fb7185;
+    /* rose */
+
+    --ok: #2fe89d;
+    --warn: #ffcf5a;
+    --danger: #ff4d6d;
+
+    --shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
+    --shadow2: 0 10px 30px rgba(0, 0, 0, 0.45);
+
+    --r-xl: 22px;
+    --r-lg: 18px;
+    --r-md: 14px;
+
+    --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+    font-family: var(--font-sans);
+    color: var(--text);
+}
+
+/* ===== Page container ===== */
+.tasksScope.tz.pageWidth {
+    position: relative;
+    padding: 18px 18px 26px;
+    border-radius: var(--r-xl);
+    background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(124, 58, 237, 0.35), transparent 55%),
+        radial-gradient(900px 500px at 95% 10%, rgba(34, 211, 238, 0.28), transparent 55%),
+        radial-gradient(900px 600px at 60% 120%, rgba(251, 113, 133, 0.22), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg0));
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+/* subtle noise overlay (lightweight) */
+.tasksScope.tz.pageWidth::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");
+}
+
+/* ===== Common helpers ===== */
+.tasksScope.tz .mono {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+}
+
+.tasksScope.tz .tz-row {
+    display: flex;
+}
+
+.tasksScope.tz .tz-wrap {
+    flex-wrap: wrap;
+}
+
+.tasksScope.tz .tz-muted {
+    color: var(--muted);
+}
+
+.tasksScope.tz .tz-muted2 {
+    color: var(--muted2);
+}
+
+/* ===== Panels ===== */
+.tasksScope.tz .tz-panel {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.06));
+    border: 1px solid var(--stroke);
+    border-radius: var(--r-xl);
+    box-shadow: var(--shadow2);
+    backdrop-filter: blur(12px);
+}
+
+/* ===== Hero ===== */
+.tasksScope.tz .tz-hero {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 14px;
+    align-items: stretch;
+    margin-bottom: 14px;
+}
+
+.tasksScope.tz .tz-heroLeft,
+.tasksScope.tz .tz-heroRight {
+    padding: 16px;
+    border-radius: var(--r-xl);
+    border: 1px solid var(--stroke);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.06));
+    backdrop-filter: blur(12px);
+    box-shadow: var(--shadow2);
+}
+
+.tasksScope.tz .tz-kicker {
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0.75;
+}
+
+.tasksScope.tz .tz-h1 {
+    margin-top: 8px;
+    font-family: var(--font-display);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    font-size: 28px;
+    line-height: 1.15;
+}
+
+.tasksScope.tz .tz-h1Sub {
+    font-weight: 800;
+    opacity: 0.75;
+}
+
+.tasksScope.tz .tz-heroMeta {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 14px;
+    align-items: end;
+}
+
+.tasksScope.tz .tz-quick {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+.tasksScope.tz .tz-progressTop {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.tasksScope.tz .tz-progressTop b {
+    font-weight: 900;
+    letter-spacing: -0.01em;
+}
+
+.tasksScope.tz .tz-progressBar {
+    margin-top: 8px;
+    height: 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    overflow: hidden;
+}
+
+.tasksScope.tz .tz-progressFill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--brandA), var(--brandB), var(--brandC));
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12) inset;
+    transition: width 320ms var(--ease);
+}
+
+/* ===== Stat cards ===== */
+.tasksScope.tz .tz-statGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    height: 100%;
+}
+
+.tasksScope.tz .tz-stat {
+    padding: 12px;
+    border-radius: var(--r-lg);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    background: rgba(255, 255, 255, 0.06);
+    transition: transform 220ms var(--ease), border-color 220ms var(--ease);
+}
+
+.tasksScope.tz .tz-stat:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+.tasksScope.tz .tz-statLabel {
+    font-size: 12.5px;
+    opacity: 0.78;
+    font-weight: 800;
+}
+
+.tasksScope.tz .tz-statValue {
+    margin-top: 6px;
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+}
+
+.tasksScope.tz .tz-statHint {
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--muted2);
+}
+
+/* ===== Layout ===== */
+.tasksScope.tz .tz-layout {
+    display: grid;
+    grid-template-columns: 1.55fr 0.9fr;
+    gap: 14px;
+    align-items: start;
+}
+
+.tasksScope.tz .tz-main {
+    min-width: 0;
+}
+
+.tasksScope.tz .tz-side {
+    position: sticky;
+    top: 14px;
+}
+
+/* ===== Filters panel ===== */
+.tasksScope.tz .tz-filters {
+    padding: 12px;
+}
+
+.tasksScope.tz .tz-filterBar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.tasksScope.tz .tz-search {
+    flex: 1 1 260px;
+    min-width: 220px;
+}
+
+.tasksScope.tz .tz-seg {
+    display: inline-flex;
+    padding: 4px;
+    gap: 4px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.tasksScope.tz .tz-segBtn {
+    border: 0;
+    cursor: pointer;
+    padding: 8px 10px;
+    border-radius: 999px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.78);
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    transition: background 180ms var(--ease), transform 180ms var(--ease), color 180ms var(--ease);
+}
+
+.tasksScope.tz .tz-segBtn:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.tasksScope.tz .tz-segBtn.isActive {
+    color: rgba(255, 255, 255, 0.95);
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.55), rgba(34, 211, 238, 0.35));
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* ===== Inputs / selects ===== */
+.tasksScope.tz .input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(0, 0, 0, 0.22);
+    color: var(--text);
+    outline: none;
+    transition: border-color 180ms var(--ease), box-shadow 180ms var(--ease), transform 180ms var(--ease);
+}
+
+.tasksScope.tz .input:focus {
+    border-color: rgba(34, 211, 238, 0.55);
+    box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.14);
+}
+
+.tasksScope.tz .input::placeholder {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.tasksScope.tz .input--sm {
+    padding: 9px 10px;
+    border-radius: 12px;
+}
+
+.tasksScope.tz select.input {
+    appearance: none;
+    background-image:
+        linear-gradient(45deg, transparent 50%, rgba(255, 255, 255, 0.55) 50%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.55) 50%, transparent 50%);
+    background-position:
+        calc(100% - 18px) calc(50% - 3px),
+        calc(100% - 12px) calc(50% - 3px);
+    background-size: 6px 6px, 6px 6px;
+    background-repeat: no-repeat;
+    padding-right: 30px;
+}
+
+/* textarea nicer */
+.tasksScope.tz .tz-textarea {
+    min-height: 92px;
+    resize: vertical;
+}
+
+/* ===== Buttons (override your existing .btn lightly) ===== */
+.tasksScope.tz .btn {
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.92);
+    padding: 10px 12px;
+    border-radius: 14px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    transition: transform 180ms var(--ease), border-color 180ms var(--ease), background 180ms var(--ease), box-shadow 180ms var(--ease);
+}
+
+.tasksScope.tz .btn:hover {
+    transform: translateY(-1px);
+    border-color: rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.tasksScope.tz .btn:active {
+    transform: translateY(0px) scale(0.99);
+}
+
+.tasksScope.tz .btn-sm {
+    padding: 8px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+}
+
+.tasksScope.tz .btn-primary {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.75), rgba(34, 211, 238, 0.45), rgba(251, 113, 133, 0.38));
+    box-shadow: 0 10px 26px rgba(124, 58, 237, 0.22);
+}
+
+.tasksScope.tz .btn-primary:hover {
+    box-shadow: 0 14px 34px rgba(124, 58, 237, 0.28);
+}
+
+.tasksScope.tz .btn-ghost {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.tasksScope.tz .btn-danger {
+    border: 1px solid rgba(255, 77, 109, 0.35);
+    background: linear-gradient(135deg, rgba(255, 77, 109, 0.55), rgba(255, 77, 109, 0.25));
+}
+
+.tasksScope.tz .btn-danger:hover {
+    border-color: rgba(255, 77, 109, 0.55);
+}
+
+/* ===== Alerts ===== */
+.tasksScope.tz .alert {
+    margin-top: 12px;
+    padding: 12px 12px;
+    border-radius: var(--r-lg);
+    border: 1px solid rgba(255, 77, 109, 0.35);
+    background: rgba(255, 77, 109, 0.12);
+    color: rgba(255, 255, 255, 0.92);
+}
+
+.tasksScope.tz .tz-alert {
+    backdrop-filter: blur(10px);
+}
+
+/* ===== Task list ===== */
+.tasksScope.tz .tz-list {
+    margin-top: 12px;
+    display: grid;
+    gap: 10px;
+}
+
+.tasksScope.tz .tz-card {
+    border-radius: var(--r-xl);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.06));
+    box-shadow: var(--shadow2);
+    backdrop-filter: blur(12px);
+    overflow: hidden;
+    transition: transform 220ms var(--ease), border-color 220ms var(--ease);
+}
+
+.tasksScope.tz .tz-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.20);
+}
+
+.tasksScope.tz .tz-task {
+    position: relative;
+}
+
+/* status accent line */
+.tasksScope.tz .tz-task.open::before,
+.tasksScope.tz .tz-task.done::before,
+.tasksScope.tz .tz-task.overdue::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+}
+
+.tasksScope.tz .tz-task.open::before {
+    background: rgba(124, 58, 237, 0.75);
+}
+
+.tasksScope.tz .tz-task.done::before {
+    background: rgba(47, 232, 157, 0.85);
+}
+
+.tasksScope.tz .tz-task.overdue::before {
+    background: rgba(255, 77, 109, 0.85);
+}
+
+.tasksScope.tz .tz-taskTop {
+    display: grid;
+    grid-template-columns: 38px 1fr auto;
+    gap: 12px;
+    padding: 14px 14px 10px 14px;
+    align-items: start;
+}
+
+.tasksScope.tz .tz-taskMeta {
+    min-width: 0;
+}
+
+.tasksScope.tz .tz-title {
+    font-weight: 1000;
+    letter-spacing: -0.02em;
+    font-size: 15.5px;
+    line-height: 1.35;
+    word-break: break-word;
+}
+
+.tasksScope.tz .tz-title.isDone {
+    opacity: 0.72;
+    text-decoration: line-through;
+}
+
+.tasksScope.tz .tz-subRow {
+    margin-top: 6px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    color: var(--muted);
+    font-size: 12.5px;
+}
+
+.tasksScope.tz .tz-dot {
+    opacity: 0.5;
+}
+
+.tasksScope.tz .tz-deadline.isOverdue {
+    color: rgba(255, 77, 109, 0.92);
+    font-weight: 900;
+}
+
+.tasksScope.tz .tz-desc {
+    margin-top: 8px;
+    color: var(--muted2);
+    font-size: 13px;
+    line-height: 1.45;
+    word-break: break-word;
+}
+
+.tasksScope.tz .tz-actions {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.tasksScope.tz .tz-taskBottom {
+    padding: 10px 14px 14px 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tasksScope.tz .tz-warnLine {
+    color: rgba(255, 207, 90, 0.95);
+    font-weight: 800;
+}
+
+.tasksScope.tz .tz-okLine {
+    color: rgba(47, 232, 157, 0.95);
+    font-weight: 900;
+}
+
+/* Pills */
+.tasksScope.tz .tz-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.06);
+    font-weight: 900;
+}
+
+.tasksScope.tz .tz-pill--open {
+    border-color: rgba(124, 58, 237, 0.35);
+    background: rgba(124, 58, 237, 0.14);
+}
+
+.tasksScope.tz .tz-pill--done {
+    border-color: rgba(47, 232, 157, 0.35);
+    background: rgba(47, 232, 157, 0.12);
+}
+
+.tasksScope.tz .tz-pill--overdue {
+    border-color: rgba(255, 77, 109, 0.38);
+    background: rgba(255, 77, 109, 0.14);
+}
+
+/* ===== Custom checkbox ===== */
+.tasksScope.tz .tz-check {
+    position: relative;
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+}
+
+.tasksScope.tz .tz-check input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    cursor: pointer;
+}
+
+.tasksScope.tz .tz-checkUI {
+    width: 22px;
+    height: 22px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(0, 0, 0, 0.22);
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.02);
+    transition: transform 180ms var(--ease), border-color 180ms var(--ease), background 180ms var(--ease);
+}
+
+.tasksScope.tz .tz-check:hover .tz-checkUI {
+    transform: translateY(-1px);
+    border-color: rgba(34, 211, 238, 0.45);
+}
+
+.tasksScope.tz .tz-check input:checked+.tz-checkUI {
+    background: linear-gradient(135deg, rgba(47, 232, 157, 0.6), rgba(34, 211, 238, 0.35));
+    border-color: rgba(47, 232, 157, 0.45);
+}
+
+.tasksScope.tz .tz-check input:checked+.tz-checkUI::after {
+    content: "✓";
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    font-weight: 1000;
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 14px;
+}
+
+/* ===== Skeleton ===== */
+.tasksScope.tz .tz-skeleton {
+    padding: 14px;
+}
+
+.tasksScope.tz .tz-skelLine {
+    height: 12px;
+    border-radius: 999px;
+    background: linear-gradient(90deg,
+            rgba(255, 255, 255, 0.08),
+            rgba(255, 255, 255, 0.14),
+            rgba(255, 255, 255, 0.08));
+    background-size: 200% 100%;
+    animation: tz-shimmer 1.2s linear infinite;
+    margin-top: 10px;
+}
+
+.tasksScope.tz .tz-skelLine:first-child {
+    margin-top: 0;
+}
+
+.tasksScope.tz .tz-skelLine.w70 {
+    width: 70%;
+}
+
+.tasksScope.tz .tz-skelLine.w95 {
+    width: 95%;
+}
+
+.tasksScope.tz .tz-skelLine.w55 {
+    width: 55%;
+}
+
+@keyframes tz-shimmer {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    100% {
+        background-position: 200% 50%;
+    }
+}
+
+/* ===== Empty state ===== */
+.tasksScope.tz .tz-empty {
+    margin-top: 12px;
+    padding: 22px 16px;
+    text-align: center;
+}
+
+.tasksScope.tz .tz-emptyEmoji {
+    font-size: 34px;
+}
+
+.tasksScope.tz .tz-emptyTitle {
+    margin-top: 8px;
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 1000;
+    letter-spacing: -0.02em;
+}
+
+.tasksScope.tz .tz-emptyDesc {
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 13.5px;
+    line-height: 1.55;
+}
+
+/* ===== Sidebar tips ===== */
+.tasksScope.tz .tz-tips {
+    padding: 14px;
+}
+
+.tasksScope.tz .tz-tipsTitle {
+    font-weight: 1000;
+    letter-spacing: -0.01em;
+}
+
+.tasksScope.tz .tz-tipsList {
+    margin: 10px 0 0;
+    padding-left: 18px;
+    color: var(--muted);
+    line-height: 1.65;
+    font-size: 13px;
+}
+
+.tasksScope.tz .tz-tipsList li {
+    margin: 6px 0;
+}
+
+/* ===== Streak widget polish ===== */
+.tasksScope.tz .streak-card {
+    border-radius: var(--r-xl);
+}
+
+.tasksScope.tz .streak-main {
+    font-weight: 1000;
+    letter-spacing: -0.01em;
+}
+
+.tasksScope.tz .streak-count {
+    font-family: var(--font-display);
+    font-weight: 1000;
+    font-size: 26px;
+    margin-right: 6px;
+    background: linear-gradient(135deg, var(--brandA), var(--brandB), var(--brandC));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.tasksScope.tz .streak-sub {
+    color: var(--muted);
+    font-size: 12.5px;
+}
+
+.tasksScope.tz .streak-warning {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: var(--r-lg);
+    border: 1px solid rgba(255, 207, 90, 0.25);
+    background: rgba(255, 207, 90, 0.10);
+    color: rgba(255, 255, 255, 0.90);
+}
+
+.tasksScope.tz .streak-ok {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: var(--r-lg);
+    border: 1px solid rgba(47, 232, 157, 0.22);
+    background: rgba(47, 232, 157, 0.10);
+    color: rgba(255, 255, 255, 0.90);
+}
+
+/* tag (your existing) */
+.tasksScope.tz .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.06);
+    font-weight: 900;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.88);
+}
+
+/* ===== Modal ===== */
+.tasksScope.tz .md-modalBackdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.58);
+    backdrop-filter: blur(10px);
+    display: grid;
+    place-items: center;
+    z-index: 1000;
+    padding: 18px;
+}
+
+.tasksScope.tz .md-modal {
+    width: min(680px, 100%);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: linear-gradient(180deg, rgba(17, 24, 39, 0.92), rgba(7, 10, 18, 0.88));
+    box-shadow: 0 26px 80px rgba(0, 0, 0, 0.65);
+    overflow: hidden;
+}
+
+.tasksScope.tz .md-modalHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 14px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.tasksScope.tz .md-modalTitle {
+    font-family: var(--font-display);
+    font-weight: 1000;
+    letter-spacing: -0.02em;
+}
+
+.tasksScope.tz .md-modalBody {
+    padding: 14px;
+}
+
+.tasksScope.tz .tz-helper {
+    margin-top: 6px;
+    opacity: 0.78;
+    font-size: 13.5px;
+}
+
+/* field labels */
+.tasksScope.tz .field {
+    margin-top: 12px;
+}
+
+.tasksScope.tz .label {
+    display: block;
+    font-weight: 900;
+    opacity: 0.85;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+}
+
+/* ===== Floating Action Button ===== */
+.tasksScope.tz .tz-fab {
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
+    width: 54px;
+    height: 54px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    font-size: 20px;
+    padding: 0;
+    z-index: 900;
+    box-shadow: 0 16px 40px rgba(124, 58, 237, 0.25);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 980px) {
+    .tasksScope.tz .tz-hero {
+        grid-template-columns: 1fr;
+    }
+
+    .tasksScope.tz .tz-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .tasksScope.tz .tz-side {
+        position: static;
+    }
+
+    .tasksScope.tz .tz-statGrid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 560px) {
+    .tasksScope.tz.pageWidth {
+        padding: 14px 12px 20px;
+    }
+
+    .tasksScope.tz .tz-h1 {
+        font-size: 22px;
+    }
+
+    .tasksScope.tz .tz-statGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .tasksScope.tz .tz-taskTop {
+        grid-template-columns: 38px 1fr;
+    }
+
+    .tasksScope.tz .tz-actions {
+        grid-column: 1 / -1;
+        justify-content: flex-start;
+    }
+}
+
+/* ===== Reduce motion ===== */
+@media (prefers-reduced-motion: reduce) {
+    .tasksScope.tz * {
+        animation: none !important;
+        transition: none !important;
+    }
+}

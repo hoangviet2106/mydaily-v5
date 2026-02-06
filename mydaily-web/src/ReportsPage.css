@@ -1,0 +1,633 @@
+/* ============================
+   REPORTS PAGE — MATCH DASHBOARD HOME VIBE
+   (full-bleed, no center boxed layout)
+   ============================ */
+
+.rpPage {
+    width: 100%;
+    min-height: 100vh;
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Make dashContainer full-bleed but still nice on ultra-wide */
+.rpContainer {
+    max-width: 1400px;
+    /* đồng bộ với dashboard */
+    margin: 0 auto;
+    padding: 0 24px 40px;
+}
+
+/* Header tools area */
+.rpHeader {
+    margin-bottom: 22px;
+    /* dashboard uses 32, reports tighter */
+}
+
+.rpHeader__tools {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.rpPlan {
+    display: flex;
+    align-items: center;
+}
+
+/* Filter card like a mini glass panel */
+.rpFilterCard {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 18px;
+    padding: 14px;
+    min-width: 420px;
+    backdrop-filter: blur(10px);
+}
+
+.rpFilterCard__row {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.rpField {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.rpField__label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 700;
+}
+
+.rpField__input {
+    height: 42px;
+    padding: 0 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.9);
+    outline: none;
+    transition: all .25s ease;
+    min-width: 120px;
+}
+.rpField__input {
+    color-scheme: dark;
+    /* ✅ quan trọng: ép UI dropdown theo dark mode */
+}
+/* Màu chữ + nền của option */
+.rpField__input option {
+    background: #0f1220;
+    color: rgba(255, 255, 255, .92);
+}
+
+.rpField__input:focus {
+    border-color: rgba(102, 126, 234, 0.55);
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.16);
+}
+
+.rpReload {
+    height: 42px;
+}
+
+/* Total */
+.rpTotal {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.rpTotal__label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 700;
+}
+
+.rpTotal__value {
+    margin-top: 6px;
+    font-size: 16px;
+    font-weight: 900;
+    color: white;
+}
+
+/* Tabs grid -> like quick actions / hero grid */
+.rpTabs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    margin: 18px 0 18px;
+}
+
+/* Tab cards mimic heroCard hover */
+.rpTabCard {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 18px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    text-align: left;
+}
+
+.rpTabCard::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity .3s ease;
+    pointer-events: none;
+}
+
+.rpTabCard--purple::before {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+}
+
+.rpTabCard--blue::before {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.18) 0%, rgba(37, 99, 235, 0.18) 100%);
+}
+
+.rpTabCard--pink::before {
+    background: linear-gradient(135deg, rgba(236, 72, 153, 0.18) 0%, rgba(219, 39, 119, 0.18) 100%);
+}
+
+.rpTabCard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.rpTabCard:hover::before {
+    opacity: 1;
+}
+
+.rpTabCard--active {
+    border-color: rgba(102, 126, 234, 0.45);
+    box-shadow: 0 12px 32px rgba(102, 126, 234, 0.18);
+}
+
+.rpTabCard__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+}
+
+.rpTabCard__icon {
+    font-size: 22px;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.25));
+}
+
+.rpTabCard__title {
+    font-size: 14px;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.85);
+    text-transform: uppercase;
+    letter-spacing: .4px;
+}
+
+.rpTabCard__desc {
+    margin-top: 10px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 13px;
+    position: relative;
+    z-index: 1;
+}
+
+.rpTabCard__arrow {
+    position: absolute;
+    right: 16px;
+    bottom: 14px;
+    color: rgba(255, 255, 255, 0.30);
+    font-size: 20px;
+    transition: all .3s ease;
+}
+
+.rpTabCard:hover .rpTabCard__arrow {
+    transform: translateX(4px);
+    color: rgba(255, 255, 255, 0.75);
+}
+
+/* Section header (like dashboard quick actions title) */
+.rpSectionHeader {
+    margin: 6px 0 16px;
+}
+
+.rpSectionSub {
+    margin-top: 6px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* Split layout for content cards */
+.rpSplit {
+    display: grid;
+    grid-template-columns: 1.3fr 0.9fr;
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.rpPanel {
+    border-radius: 20px;
+}
+
+/* Chart */
+.rpChart__canvas {
+    width: 100%;
+    height: 320px;
+}
+
+.rpChart__note {
+    margin-top: 10px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 600;
+}
+
+/* Premium lock */
+.rpPremium {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px dashed rgba(255, 255, 255, 0.18);
+}
+
+.rpPremium__title {
+    font-size: 14px;
+    font-weight: 900;
+    color: white;
+    margin-bottom: 6px;
+}
+
+.rpPremium__desc {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.65);
+    font-weight: 600;
+    margin-bottom: 12px;
+    max-width: 420px;
+}
+
+.rpPremium__hint {
+    margin-top: 10px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.55);
+    font-weight: 600;
+}
+
+.rpPremium__mock {
+    min-width: 220px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Skeleton blocks used inside premium mock */
+.rpSkel {
+    border-radius: 12px;
+    background: linear-gradient(90deg,
+            rgba(255, 255, 255, 0.05) 25%,
+            rgba(255, 255, 255, 0.1) 50%,
+            rgba(255, 255, 255, 0.05) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+.rpSkel--lg {
+    height: 120px;
+}
+
+.rpSkel--md {
+    height: 44px;
+}
+
+.rpSkel--sm {
+    height: 26px;
+}
+
+/* Empty state */
+.rpEmpty {
+    padding: 18px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    text-align: center;
+}
+
+.rpEmpty__icon {
+    font-size: 44px;
+    margin-bottom: 10px;
+}
+
+.rpEmpty__title {
+    font-size: 16px;
+    font-weight: 900;
+    color: white;
+}
+
+.rpEmpty__desc {
+    margin-top: 6px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.62);
+    font-weight: 600;
+}
+
+/* Banner */
+.rpBanner {
+    border-radius: 16px;
+    padding: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    align-items: center;
+}
+
+.rpBanner__title {
+    font-size: 16px;
+    font-weight: 900;
+    color: white;
+}
+
+.rpBanner__sub {
+    margin-top: 6px;
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.rpBanner__right {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 220px;
+}
+
+.rpBanner--neutral {
+    border-color: rgba(255, 255, 255, 0.14);
+}
+
+.rpBanner--ok {
+    border-color: rgba(34, 197, 94, 0.35);
+    background: rgba(34, 197, 94, 0.10);
+}
+
+.rpBanner--warn {
+    border-color: rgba(251, 146, 60, 0.35);
+    background: rgba(251, 146, 60, 0.10);
+}
+
+.rpBanner--danger {
+    border-color: rgba(239, 68, 68, 0.35);
+    background: rgba(239, 68, 68, 0.10);
+}
+
+/* Meter */
+.rpMeter__track {
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.10);
+    overflow: hidden;
+}
+
+.rpMeter__fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+.rpMeter__ticks {
+    margin-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.55);
+    font-weight: 700;
+}
+
+/* Pills */
+.rpPill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.rpPill--ok {
+    border-color: rgba(34, 197, 94, 0.35);
+    background: rgba(34, 197, 94, 0.12);
+    color: #22c55e;
+}
+
+.rpPill--warn {
+    border-color: rgba(251, 146, 60, 0.35);
+    background: rgba(251, 146, 60, 0.12);
+    color: #fb923c;
+}
+
+.rpPill--danger {
+    border-color: rgba(239, 68, 68, 0.35);
+    background: rgba(239, 68, 68, 0.12);
+    color: #ef4444;
+}
+
+.rpPill--premium {
+    border: none;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+/* Table */
+.rpTableWrap {
+    margin-top: 12px;
+    overflow: auto;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.rpTable {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 720px;
+}
+
+.rpTable thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: rgba(16, 17, 34, 0.92);
+    color: rgba(255, 255, 255, 0.72);
+    padding: 12px 14px;
+    font-size: 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.rpTable tbody td {
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.86);
+}
+
+.rpTable tbody tr:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.rpTdMuted {
+    padding: 16px;
+    color: rgba(255, 255, 255, 0.60);
+    font-weight: 600;
+}
+
+/* Spark bar */
+.rpSpark {
+    position: relative;
+    height: 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.10);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.rpSpark__bar {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+.rpSpark__txt {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.75);
+    font-weight: 800;
+}
+
+/* Small helpers */
+.rpHint {
+    margin-top: 12px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.60);
+    font-weight: 600;
+}
+
+.rpInlineLock {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px dashed rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.03);
+    color: rgba(255, 255, 255, 0.60);
+    font-weight: 600;
+}
+
+.rpMono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.rpMuted {
+    color: rgba(255, 255, 255, 0.60);
+}
+
+/* Tooltip */
+.rpTooltip {
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(16, 17, 34, 0.92);
+    border-radius: 14px;
+    padding: 10px 12px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.rpTooltip__label {
+    font-weight: 900;
+    color: white;
+    margin-bottom: 6px;
+}
+
+.rpTooltip__row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 12.5px;
+}
+
+.rpTooltip__k {
+    color: rgba(255, 255, 255, 0.62);
+}
+
+.rpTooltip__v {
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.86);
+}
+
+/* Loading blocks */
+.rpLoading {
+    margin-top: 10px;
+}
+
+.rpLoading__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .rpFilterCard {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .rpHeader__tools {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .rpSplit {
+        grid-template-columns: 1fr;
+    }
+
+    .rpLoading__grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .rpContainer {
+        padding: 0 14px 34px;
+    }
+
+    .rpTabs {
+        grid-template-columns: 1fr;
+    }
+}

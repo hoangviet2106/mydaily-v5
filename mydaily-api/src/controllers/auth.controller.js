@@ -6,14 +6,14 @@ const crypto = require("crypto");
 
 // ===== Schemas =====
 const registerSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-  name: z.string().min(1).max(100),
+  email: z.string().email("Email không hợp lệ"),
+  password: z.string().min(6, "Mật khẩu phải >= 6 ký tự"),
+  name: z.string().min(1, "Tên không được để trống").max(100, "Tên tối đa 100 ký tự"),
 });
 
 const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1),
+  email: z.string().email("Email không hợp lệ"),
+  password: z.string().min(1, "Mật khẩu không được để trống"),
 });
 
 // ===== Helpers =====

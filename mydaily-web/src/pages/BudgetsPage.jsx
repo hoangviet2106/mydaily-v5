@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { fetchExpenses } from "../api/expenses";
 import { fetchBudgetByMonthYear, upsertBudget } from "../api/budgets";
+import { AppIcon } from "../icons"; // ✅ NEW
+import "../BudgetsPage.css";
 
 function pad2(n) {
   return String(n).padStart(2, "0");
@@ -18,43 +20,68 @@ function toMonthYear(dateStr) {
   return { month: d.getMonth() + 1, year: d.getFullYear() };
 }
 
-function BudgetStatus({ budget, actual }) {
+function clamp(n, min, max) {
+  return Math.min(max, Math.max(min, n));
+}
+
+function Pill({ tone = "neutral", children }) {
+  return <span className={`budPill budPill--${tone}`}>{children}</span>;
+}
+
+function StatusBanner({ budget, actual }) {
   const limit = Number(budget?.limit_amount || 0);
   const spent = Number(actual || 0);
 
   if (!budget) {
     return (
-      <div className="banner banner--neutral">
-        <div className="banner__left">
-          <div className="banner__title">Chưa thiết lập ngân sách</div>
-          <div className="banner__sub">
-            Bạn có thể tạo Budget cho tháng này để hệ thống cảnh báo khi chi tiêu tăng cao.
-          </div>
+      <div className="budBanner budBanner--neutral">
+        <div className="budBanner__title">Chưa thiết lập ngân sách</div>
+        <div className="budBanner__sub">
+          Tạo Budget để hệ thống cảnh báo khi chi tiêu tăng cao và giúp bạn giữ nhịp tài chính.
         </div>
+        <Pill tone="neutral">No Budget</Pill>
       </div>
     );
   }
 
   const percent = limit > 0 ? Math.round((spent / limit) * 100) : 0;
 
-  let cls = "banner banner--ok";
+  let cls = "budBanner budBanner--ok";
   let label = "Trong ngưỡng";
+  let pill = "ok";
   if (percent >= 100) {
-    cls = "banner banner--danger";
+    cls = "budBanner budBanner--danger";
     label = "Vượt ngân sách";
+    pill = "danger";
   } else if (percent >= 80) {
-    cls = "banner banner--warn";
+    cls = "budBanner budBanner--warn";
     label = "Sắp vượt ngân sách";
+    pill = "warn";
   }
 
   return (
     <div className={cls}>
-      <div className="banner__left">
-        <div className="banner__title">{label}</div>
-        <div className="banner__sub">
-          Tổng chi: {formatMoney(spent)} / Budget: {formatMoney(limit)} ({percent}%)
+      <div>
+        <div className="budBanner__title">{label}</div>
+        <div className="budBanner__sub">
+          Tổng chi: <b>{formatMoney(spent)}</b> / Budget: <b>{formatMoney(limit)}</b>{" "}
+          <span className="budMono">({percent}%)</span>
         </div>
       </div>
+      <Pill tone={pill}>{pill === "danger" ? "Over" : pill === "warn" ? "Warning" : "OK"}</Pill>
+    </div>
+  );
+}
+
+function ProgressRing({ percent = 0 }) {
+  const p = clamp(Number(percent || 0), 0, 100);
+  return (
+    <div className="budRing" aria-label={`Budget usage ${p}%`}>
+      <div className="budRing__inner">
+        <div className="budRing__value">{p}%</div>
+        <div className="budRing__label">Đã dùng</div>
+      </div>
+      <div className="budRing__track" style={{ "--p": `${p}%` }} />
     </div>
   );
 }
@@ -69,7 +96,7 @@ export default function BudgetsPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  const [budget, setBudget] = useState(null); // { id, month, year, limit_amount, ... }
+  const [budget, setBudget] = useState(null);
   const [draftAmount, setDraftAmount] = useState("");
 
   const [expenses, setExpenses] = useState([]);
@@ -83,16 +110,16 @@ export default function BudgetsPage() {
       .reduce((s, e) => s + Number(e.amount || 0), 0);
   }, [expenses, month, year]);
 
+  const limit = useMemo(() => Number(budget?.limit_amount || 0), [budget]);
+
   const remaining = useMemo(() => {
-    const limit = Number(budget?.limit_amount || 0);
-    return Math.max(limit - actual, 0);
-  }, [budget, actual]);
+    return budget ? Math.max(limit - actual, 0) : 0;
+  }, [budget, limit, actual]);
 
   const percentUsed = useMemo(() => {
-    const limit = Number(budget?.limit_amount || 0);
     if (!budget || limit <= 0) return 0;
-    return Math.min(100, Math.round((actual / limit) * 100));
-  }, [budget, actual]);
+    return clamp(Math.round((actual / limit) * 100), 0, 100);
+  }, [budget, limit, actual]);
 
   async function load() {
     setLoading(true);
@@ -101,7 +128,6 @@ export default function BudgetsPage() {
       const [exps, b] = await Promise.all([fetchExpenses(), fetchBudgetByMonthYear(month, year)]);
       setExpenses(exps || []);
 
-      // GET /budgets trả thẳng budget object hoặc null
       const normalized = b?.budget ?? b?.data ?? b ?? null;
 
       const amt =
@@ -180,155 +206,204 @@ export default function BudgetsPage() {
     setError("");
   };
 
+  const periodLabel = `${pad2(Number(month))}/${year}`;
+
   return (
-    <div className="pageWidth">
-      <div className="card pad-lg">
-        {/* Header */}
-        <div className="dashHeader">
-          <div>
-            <div className="pageTitle">Ngân sách</div>
-            <div className="dashDate">
-              Thiết lập ngân sách theo tháng và theo dõi Ngân sách vs Chi tiêu.
+    <div className="budPage">
+      <div className="dashContainer budContainer">
+        {/* HERO */}
+        <div className="budHero">
+          <div className="budHero__left">
+            <div>
+              <div className="budHero__title">
+                <span className="dashHeader__wave">💸</span>{" "} Ngân sách <span className="budHero__grad">thông minh</span> </div>
+              <div className="budHero__sub">
+                Thiết lập ngân sách theo tháng, theo dõi <b>Budget vs Chi tiêu</b>, nhận cảnh báo sớm khi sắp vượt ngưỡng.
+              </div>
+            </div>
+
+            <div className="budHero__chips">
+              <Pill tone="neutral">Period: {periodLabel}</Pill>
+              <Pill tone={budget ? "ok" : "neutral"}>{budget ? "Budget Active" : "No Budget"}</Pill>
+              <Pill tone={percentUsed >= 80 ? (percentUsed >= 100 ? "danger" : "warn") : "ok"}>
+                Usage: {budget ? `${percentUsed}%` : "—"}
+              </Pill>
             </div>
           </div>
 
-          <div className="pageActions">
-            <button className="btn" onClick={load} disabled={loading}>
-              Tải lại trang
+          <div className="budHero__right">
+            <button className="btn btn--secondary" onClick={load} disabled={loading} type="button">
+              {/* ✅ was 🔄 */}
+              <AppIcon name="reload" size={16} /> Tải lại
             </button>
           </div>
         </div>
 
-        {error ? <div className="alert">{error}</div> : null}
+        {error ? <div className="budAlert budAlert--danger">{error}</div> : null}
 
-        {/* Filters + Editor */}
-        <div className="toolbar" style={{ marginTop: 10 }}>
-          <div className="toolbar__left">
-            <div className="toolbar__group">
-              <label className="label" style={{ margin: 0 }}>
-                Month
-              </label>
-              <select className="input input--sm" value={month} onChange={(e) => setMonth(e.target.value)}>
-                {Array.from({ length: 12 }).map((_, i) => {
-                  const m = i + 1;
-                  return (
-                    <option key={m} value={m}>
-                      {pad2(m)}
-                    </option>
-                  );
-                })}
-              </select>
+        {/* EDITOR (glass) */}
+        <div className="budEditor">
+          <div className="budEditor__group">
+            <label className="budLabel">Month</label>
+            <select className="budInput" value={month} onChange={(e) => setMonth(e.target.value)}>
+              {Array.from({ length: 12 }).map((_, i) => {
+                const m = i + 1;
+                return (
+                  <option key={m} value={m}>
+                    {pad2(m)}
+                  </option>
+                );
+              })}
+            </select>
 
-              <label className="label" style={{ margin: 0 }}>
-                Year
-              </label>
-              <input
-                className="input input--sm"
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
-                inputMode="numeric"
-                style={{ width: 110 }}
-              />
-            </div>
-
-            <div className="toolbar__group">
-              <label className="label" style={{ margin: 0 }}>
-                Ngân sách
-              </label>
-              <input
-                className="input input--sm"
-                placeholder="Ví dụ: 3000000"
-                value={draftAmount}
-                onChange={(e) => setDraftAmount(e.target.value)}
-                inputMode="numeric"
-                style={{ width: 220 }}
-              />
-
-              <button className="btn btn-primary" onClick={onSave} disabled={saving || loading}>
-                {saving ? "Saving…" : budget ? "Cập nhật ngân sách" : "Tạo ngân sách mới"}
-              </button>
-
-              <button className="btn" onClick={onResetDraft} disabled={saving || loading}>
-                Cài lại
-              </button>
-            </div>
+            <label className="budLabel">Year</label>
+            <input
+              className="budInput"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              inputMode="numeric"
+              style={{ width: 140 }}
+            />
           </div>
 
-          <div className="toolbar__right">
-            <div className="stat">
-              <div className="stat__label">Chi tiêu</div>
-              <div className="stat__value">{formatMoney(actual)} VNĐ</div>
-            </div>
-            <div className="stat">
-              <div className="stat__label">Còn lại</div>
-              <div className="stat__value">{formatMoney(remaining)} VNĐ</div>
-            </div>
+          <div className="budEditor__group budEditor__group--grow">
+            <label className="budLabel">Ngân sách</label>
+            <input
+              className="budInput"
+              placeholder="Ví dụ: 3000000"
+              value={draftAmount}
+              onChange={(e) => setDraftAmount(e.target.value)}
+              inputMode="numeric"
+            />
+
+            <button className="btn btn--primary" onClick={onSave} disabled={saving || loading} type="button">
+              {saving ? "Saving…" : budget ? "Cập nhật" : "Tạo mới"}
+            </button>
+
+            <button className="btn btn--secondary" onClick={onResetDraft} disabled={saving || loading} type="button">
+              Cài lại
+            </button>
           </div>
         </div>
 
-        <BudgetStatus budget={budget} actual={actual} />
+        {/* STATUS */}
+        <StatusBanner budget={budget} actual={actual} />
 
+        {/* BODY */}
         {loading ? (
-          <div className="skeleton">Loading budget…</div>
+          <div className="budLoading">
+            <div className="skeleton skeleton--hero" />
+            <div className="budLoading__grid">
+              <div className="skeleton skeleton--card" />
+              <div className="skeleton skeleton--card" />
+              <div className="skeleton skeleton--card" />
+            </div>
+          </div>
         ) : (
           <>
-            <div className="cards3" style={{ marginTop: 14 }}>
-              <div className="mini">
-                <div className="mini__label">Ngân sách</div>
-                <div className="mini__value">{budget ? formatMoney(budget.limit_amount) : "—"}</div>
-                <div className="mini__hint">
-                  Ngân sách của tháng {pad2(Number(month))}/{year}
+            <div className="budGrid">
+              {/* KPI */}
+              <div className="budCard budCard--purple">
+                <div className="budCard__label">Ngân sách tháng</div>
+                <div className="budCard__value">
+                  {budget ? formatMoney(limit) : "—"} <span className="budUnit">VNĐ</span>
                 </div>
+                <div className="budCard__hint">Áp dụng cho {periodLabel}</div>
               </div>
 
-              <div className="mini">
-                <div className="mini__label">Sử dụng</div>
-                <div className="mini__value">{budget ? `${percentUsed}%` : "—"}</div>
-
-                <div className="progress" aria-label="Budget usage">
-                  <div className="progress__bar" style={{ width: `${percentUsed}%` }} />
+              <div className="budCard budCard--blue">
+                <div className="budCard__label">Chi tiêu thực tế</div>
+                <div className="budCard__value">
+                  {formatMoney(actual)} <span className="budUnit">VNĐ</span>
                 </div>
-
-                <div className="mini__hint">Tỷ lệ sử dụng ngân sách</div>
+                <div className="budCard__hint">Tổng chi đã ghi nhận</div>
               </div>
 
-              <div className="mini">
-                <div className="mini__label">Action</div>
-                <div className="mini__value" style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)" }}>
-                  Gợi ý: nếu chi tiêu tháng này biến động mạnh, hãy cập nhật budget để phản ánh thực tế.
+              <div className="budCard budCard--green">
+                <div className="budCard__label">Còn lại</div>
+                <div className="budCard__value">
+                  {budget ? formatMoney(remaining) : "—"} <span className="budUnit">VNĐ</span>
+                </div>
+                <div className="budCard__hint">Buffer cho chi phí phát sinh</div>
+              </div>
+
+              {/* Ring + tips */}
+              <div className="budPanel">
+                <div className="budPanel__head">
+                  <div className="budPanel__title">
+                    {/* ✅ was 🎯 */}
+                    <AppIcon name="target" size={18} /> Mức độ sử dụng
+                  </div>
+                  <Pill tone={percentUsed >= 80 ? (percentUsed >= 100 ? "danger" : "warn") : "ok"}>
+                    {budget ? `${percentUsed}%` : "—"}
+                  </Pill>
+                </div>
+
+                <div className="budPanel__content">
+                  <ProgressRing percent={budget ? percentUsed : 0} />
+
+                  <div className="budTips">
+                    <div className="budTips__title">Gợi ý nhanh</div>
+                    <ul className="budTips__list">
+                      <li>
+                        Giữ usage dưới <b>80%</b> để có buffer.
+                      </li>
+                      <li>Nếu tháng này biến động, hãy cập nhật budget để phản ánh thực tế.</li>
+                      <li>Budget ổn định giúp báo cáo và insight “đáng tin” hơn.</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="budBar">
+                  <div className="budBar__track">
+                    <div className="budBar__fill" style={{ width: `${budget ? percentUsed : 0}%` }} />
+                  </div>
+                  <div className="budBar__labels">
+                    <span>0%</span>
+                    <span>80%</span>
+                    <span>100%</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Table (gọn + scroll đúng system) */}
-            <div className="table-scroll" style={{ marginTop: 14 }}>
-              <div className="table-wrap">
-                <table className="table table__head-sticky">
+            {/* Summary table */}
+            <div className="budTableCard">
+              <div className="budTableCard__head">
+                <div>
+                  <div className="budTableCard__title">
+                    {/* ✅ was 📌 */}
+                    <AppIcon name="pin" size={18} /> Tóm tắt kỳ
+                  </div>
+                  <div className="budTableCard__sub">Một dòng nhìn ra trạng thái tài chính của {periodLabel}.</div>
+                </div>
+                <div className="budTableCard__meta">
+                  <Pill tone="neutral">Period: {periodLabel}</Pill>
+                  <Pill tone={budget ? "ok" : "neutral"}>{budget ? "Active" : "None"}</Pill>
+                </div>
+              </div>
+
+              <div className="budTableWrap">
+                <table className="budTable">
                   <thead>
                     <tr>
-                      <th style={{ width: 220 }}>Thời gian</th>
-                      <th style={{ width: 200 }}>Ngân sách</th>
-                      <th style={{ width: 200 }}>Chi tiêu</th>
-                      <th style={{ width: 200 }}>Còn lại</th>
+                      <th style={{ width: 180 }}>Thời gian</th>
+                      <th style={{ width: 220 }}>Ngân sách</th>
+                      <th style={{ width: 220 }}>Chi tiêu</th>
+                      <th style={{ width: 220 }}>Còn lại</th>
                       <th>Ghi chú</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td className="mono">
-                        {pad2(Number(month))}/{year}
-                      </td>
-                      <td className="mono" style={{ fontWeight: 900 }}>
-                        {budget ? formatMoney(budget.limit_amount) : "—"}
-                      </td>
-                      <td className="mono" style={{ fontWeight: 900 }}>
-                        {formatMoney(actual)}
-                      </td>
-                      <td className="mono" style={{ fontWeight: 900 }}>
-                        {budget ? formatMoney(Math.max(Number(budget.limit_amount || 0) - actual, 0)) : "—"}
-                      </td>
-                      <td className="td-muted">
-                        {budget ? "Bạn có thể chỉnh budget ở ô phía trên." : "Chưa có budget, hãy tạo để theo dõi chi tiêu."}
+                      <td className="budMono">{periodLabel}</td>
+                      <td className="budMono budStrong">{budget ? formatMoney(limit) : "—"}</td>
+                      <td className="budMono budStrong">{formatMoney(actual)}</td>
+                      <td className="budMono budStrong">{budget ? formatMoney(remaining) : "—"}</td>
+                      <td className="budMuted">
+                        {budget
+                          ? "Bạn có thể chỉnh budget ở khu vực nhập phía trên."
+                          : "Chưa có budget — hãy tạo để theo dõi & nhận cảnh báo."}
                       </td>
                     </tr>
                   </tbody>

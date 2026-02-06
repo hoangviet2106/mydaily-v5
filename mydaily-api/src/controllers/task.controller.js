@@ -146,15 +146,45 @@ function bangkokRangeFromYMD(ymd) {
   return { startUTC, endUTC };
 }
 
-async function getStreakSnapshot(tx, userId, todayDateOnly) {
+/**
+ * ✅ FIX: Normalize streak when reading
+ * - Nếu last_streak_date không phải today/yesterday (Bangkok dateOnly) => streak đã đứt => trả current_streak = 0
+ * - Optional: write-back current_streak = 0 vào DB để dữ liệu không "ảo"
+ */
+async function getStreakSnapshot(tx, userId, now = new Date()) {
   const s = await tx.userStreak.findUnique({ where: { user_id: userId } });
-  const todayDone = s?.last_streak_date ? sameDateOnly(s.last_streak_date, todayDateOnly) : false;
+
+  const todayDateOnly = bangkokDateOnly(now);
+  const yestDateOnly = yesterdayDateOnly(todayDateOnly);
+
+  const last = s?.last_streak_date ?? null;
+
+  const isToday = last ? sameDateOnly(last, todayDateOnly) : false;
+  const isYesterday = last ? sameDateOnly(last, yestDateOnly) : false;
+
+  const todayDone = isToday;
+
+  // ✅ effective streak for UI
+  let effectiveCurrent = s?.current_streak ?? 0;
+
+  // ❗ broken if older than yesterday
+  const isBroken = !!last && !isToday && !isYesterday;
+  if (!last || isBroken) effectiveCurrent = 0;
+
+  // ✅ optional write-back
+  if (isBroken && (s?.current_streak ?? 0) !== 0) {
+    await tx.userStreak.update({
+      where: { user_id: userId },
+      data: { current_streak: 0 },
+    });
+  }
 
   return {
-    current_streak: s?.current_streak ?? 0,
+    current_streak: effectiveCurrent,
     longest_streak: s?.longest_streak ?? 0,
-    last_streak_date: s?.last_streak_date ?? null,
+    last_streak_date: last,
     today_done: todayDone,
+    today: toBangkokYMD(now),
   };
 }
 
@@ -330,7 +360,7 @@ const getTasks = async (req, res) => {
   const skip = (q.page - 1) * q.pageSize;
   const take = q.pageSize;
 
-  const [total, items] = await Promise.all([
+  const [total, items, streak] = await Promise.all([
     prisma.task.count({ where }),
     prisma.task.findMany({
       where,
@@ -347,6 +377,8 @@ const getTasks = async (req, res) => {
         completed_at: true,
       },
     }),
+    // ✅ return normalized streak for UI
+    prisma.$transaction(async (tx) => getStreakSnapshot(tx, userId, new Date())),
   ]);
 
   return res.json({
@@ -354,6 +386,7 @@ const getTasks = async (req, res) => {
     pageSize: q.pageSize,
     total,
     items,
+    streak,
   });
 };
 
@@ -469,7 +502,6 @@ const updateTask = async (req, res) => {
   // ✅ Nếu request muốn complete task
   if (patch.is_completed === true) {
     const now = new Date();
-    const todayDateOnly = bangkokDateOnly(now);
 
     const result = await prisma.$transaction(async (tx) => {
       // Nếu đã completed trước đó => không tăng streak nữa
@@ -487,8 +519,9 @@ const updateTask = async (req, res) => {
           },
         });
 
-        const streak = await getStreakSnapshot(tx, userId, todayDateOnly);
-        return { task, streak: { ...streak, today: toBangkokYMD(now) } };
+        // ✅ FIX: use normalized snapshot (auto broken => 0)
+        const streak = await getStreakSnapshot(tx, userId, now);
+        return { task, streak };
       }
 
       // 1) Update task to completed
@@ -599,9 +632,9 @@ const completeTask = async (req, res) => {
 
       // Nếu đã complete rồi => không tăng streak
       if (existing.is_completed) {
-        const todayDateOnly = bangkokDateOnly(now);
-        const streak = await getStreakSnapshot(tx, userId, todayDateOnly);
-        return { task: existing, streak: { ...streak, today: toBangkokYMD(now) } };
+        // ✅ FIX: use normalized snapshot (auto broken => 0)
+        const streak = await getStreakSnapshot(tx, userId, now);
+        return { task: existing, streak };
       }
 
       // 1) update task -> completed

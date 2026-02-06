@@ -1744,3 +1744,57 @@ body {
   justify-content: flex-end;
   border-top: 1px solid rgba(0, 0, 0, .06);
 }
+
+.appIcon {
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+/* MyDaily tones */
+.icon--purple {
+  color: #8b5cf6;
+}
+
+.icon--pink {
+  color: #ec4899;
+}
+
+.icon--blue {
+  color: #3b82f6;
+}
+
+.icon--green {
+  color: #22c55e;
+}
+
+.icon--neutral {
+  color: rgba(255, 255, 255, .85);
+}
+
+.icon--muted {
+  color: rgba(255, 255, 255, .55);
+}
+
+.icon--danger {
+  color: #ef4444;
+}
+
+.icon--warn {
+  color: #f59e0b;
+}
+
+.icon--ok {
+  color: #22c55e;
+}
+
+.icon--danger {
+  color: #ff5c7a;
+}
+
+.icon--orange {
+  color: #ff9f43;
+}
+
+.icon--ok {
+  color: #2fe89d;
+}

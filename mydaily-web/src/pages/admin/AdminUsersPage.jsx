@@ -1,5 +1,28 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import api from "../../api/axios";
+import "./AdminUsersPage.css";
+
+function Badge({ tone = "neutral", children }) {
+  return <span className={`au-badge au-badge--${tone}`}>{children}</span>;
+}
+
+function Icon({ name }) {
+  // icon mini bằng emoji để khỏi phụ thuộc thư viện
+  const map = {
+    search: "🔎",
+    users: "👥",
+    mail: "✉️",
+    name: "🪪",
+    role: "🛡️",
+    plan: "💎",
+    ban: "⛔",
+    ok: "✅",
+    prev: "⬅️",
+    next: "➡️",
+    refresh: "🔄",
+  };
+  return <span className="au-ic" aria-hidden="true">{map[name] || "✨"}</span>;
+}
 
 export default function AdminUsersPage() {
   const [search, setSearch] = useState("");
@@ -41,12 +64,24 @@ export default function AdminUsersPage() {
     load({ search, page: 1 });
   };
 
+  const totalLabel = useMemo(() => {
+    const from = meta.total === 0 ? 0 : (page - 1) * limit + 1;
+    const to = Math.min(page * limit, meta.total);
+    return `${from}-${to} / ${meta.total}`;
+  }, [meta.total, page]);
+
+  const toast = (msg) => {
+    // nhanh gọn: show error ở banner thay vì alert
+    setErr(msg);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const toggleBan = async (u) => {
     try {
       await api.patch(`/admin/users/${u.id}/ban`, { is_banned: !u.is_banned });
       await load();
     } catch (e) {
-      alert(e?.response?.data?.message || "Failed");
+      toast(e?.response?.data?.message || "Failed");
     }
   };
 
@@ -56,7 +91,7 @@ export default function AdminUsersPage() {
       await api.patch(`/admin/users/${u.id}/role`, { role: nextRole });
       await load();
     } catch (e) {
-      alert(e?.response?.data?.message || "Failed");
+      toast(e?.response?.data?.message || "Failed");
     }
   };
 
@@ -66,95 +101,217 @@ export default function AdminUsersPage() {
       await api.patch(`/admin/users/${u.id}/plan`, { account_type: nextPlan });
       await load();
     } catch (e) {
-      alert(e?.response?.data?.message || "Failed");
+      toast(e?.response?.data?.message || "Failed");
     }
   };
 
   return (
-    <div style={{ padding: 16 }}>
-      <h2 style={{ marginBottom: 12 }}>Admin • người dùng</h2>
+    <div className="au">
+      <div className="au__bg" aria-hidden="true" />
 
-      <form onSubmit={onSearchSubmit} style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Tìm kiếm theo gmail hoặc tên..."
-          style={{ flex: 1, padding: 10, borderRadius: 8, border: "1px solid #ddd" }}
-        />
-        <button type="submit" disabled={loading} style={{ padding: "10px 12px", borderRadius: 8 }}>
-          Tìm kiếm
-        </button>
-      </form>
+      <div className="au__wrap">
+        <header className="auHeader">
+          <div className="auHeader__left">
+            <div className="auHeader__title">
+              <Icon name="users" />
+              <div>
+                <h2>Admin • Người dùng</h2>
+                <p>Quản lý quyền, gói, trạng thái ban — nhanh gọn, rõ ràng.</p>
+              </div>
+            </div>
 
-      {err && <div style={{ color: "crimson", marginBottom: 10 }}>{err}</div>}
-
-      {loading ? (
-        <div>Loading...</div>
-      ) : (
-        <>
-          <div style={{ marginBottom: 10 }}>
-            Total: <b>{meta.total}</b>
+            <div className="auStats">
+              <div className="auStat">
+                <div className="auStat__k">Tổng user</div>
+                <div className="auStat__v">{meta.total}</div>
+              </div>
+              <div className="auStat">
+                <div className="auStat__k">Hiển thị</div>
+                <div className="auStat__v">{totalLabel}</div>
+              </div>
+              <div className="auStat">
+                <div className="auStat__k">Trang</div>
+                <div className="auStat__v">
+                  {page} / {meta.totalPages}
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <div className="auHeader__right">
+            <button
+              className="auBtn auBtn--ghost"
+              onClick={() => load({ page })}
+              disabled={loading}
+              type="button"
+              title="Refresh"
+            >
+              <Icon name="refresh" /> Refresh
+            </button>
+          </div>
+        </header>
+
+        <section className="auCard">
+          <div className="auToolbar">
+            <form onSubmit={onSearchSubmit} className="auSearch">
+              <div className="auSearch__box">
+                <Icon name="search" />
+                <input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Tìm theo email hoặc tên…"
+                  className="auSearch__input"
+                />
+              </div>
+              <button className="auBtn auBtn--primary" type="submit" disabled={loading}>
+                Tìm kiếm
+              </button>
+            </form>
+
+            <div className="auHint">
+              <span className={`auDot ${loading ? "auDot--spin" : ""}`} />
+              {loading ? "Đang tải dữ liệu…" : "Tip: tìm 'gmail' hoặc tên để lọc nhanh."}
+            </div>
+          </div>
+
+          {err && (
+            <div className="auAlert">
+              <strong>Thông báo:</strong> {err}
+            </div>
+          )}
+
+          <div className="auTableWrap">
+            <table className="auTable">
               <thead>
-                <tr style={{ textAlign: "left", borderBottom: "1px solid #eee" }}>
-                  <th style={{ padding: 10 }}>Email</th>
-                  <th style={{ padding: 10 }}>Tên người dùng</th>
-                  <th style={{ padding: 10 }}>Vai trò</th>
-                  <th style={{ padding: 10 }}>Tài khoản</th>
-                  <th style={{ padding: 10 }}>Cấm</th>
-                  <th style={{ padding: 10 }}>Hành động</th>
+                <tr>
+                  <th>Email</th>
+                  <th>Tên</th>
+                  <th>Vai trò</th>
+                  <th>Gói</th>
+                  <th>Ban</th>
+                  <th className="auTable__actions">Hành động</th>
                 </tr>
               </thead>
+
               <tbody>
-                {users.map((u) => (
-                  <tr key={u.id} style={{ borderBottom: "1px solid #f3f3f3" }}>
-                    <td style={{ padding: 10 }}>{u.email}</td>
-                    <td style={{ padding: 10 }}>{u.name}</td>
-                    <td style={{ padding: 10 }}>{u.role}</td>
-                    <td style={{ padding: 10 }}>{u.account_type}</td>
-                    <td style={{ padding: 10 }}>{u.is_banned ? "Yes" : "No"}</td>
-                    <td style={{ padding: 10, display: "flex", gap: 8, flexWrap: "wrap" }}>
-                      <button onClick={() => toggleBan(u)} style={{ padding: "6px 10px", borderRadius: 8 }}>
-                        {u.is_banned ? "Unban" : "Ban"}
-                      </button>
+                {users.map((u) => {
+                  const roleTone = u.role === "ADMIN" ? "violet" : "neutral";
+                  const planTone = u.account_type === "PREMIUM" ? "gold" : "neutral";
+                  const banTone = u.is_banned ? "red" : "green";
 
-                      <button onClick={() => toggleRole(u)} style={{ padding: "6px 10px", borderRadius: 8 }}>
-                        {u.role === "ADMIN" ? "Set USER" : "Set ADMIN"}
-                      </button>
+                  return (
+                    <tr key={u.id}>
+                      <td className="auMono">
+                        <Icon name="mail" /> {u.email}
+                      </td>
 
-                      <button onClick={() => togglePlan(u)} style={{ padding: "6px 10px", borderRadius: 8 }}>
-                        {u.account_type === "PREMIUM" ? "Set FREE" : "Set PREMIUM"}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {users.length === 0 && (
+                      <td>
+                        <div className="auUser">
+                          <span className="auAvatar" aria-hidden="true">
+                            {(u.name || u.email || "?").trim().slice(0, 1).toUpperCase()}
+                          </span>
+                          <div className="auUser__meta">
+                            <div className="auUser__name">
+                              {u.name || <span className="auDim">(no name)</span>}
+                            </div>
+                            <div className="auUser__sub">ID: <span className="auMono">{u.id}</span></div>
+                          </div>
+                        </div>
+                      </td>
+
+                      <td>
+                        <Badge tone={roleTone}>
+                          <Icon name="role" /> {u.role}
+                        </Badge>
+                      </td>
+
+                      <td>
+                        <Badge tone={planTone}>
+                          <Icon name="plan" /> {u.account_type}
+                        </Badge>
+                      </td>
+
+                      <td>
+                        <Badge tone={banTone}>
+                          <Icon name={u.is_banned ? "ban" : "ok"} /> {u.is_banned ? "BANNED" : "ACTIVE"}
+                        </Badge>
+                      </td>
+
+                      <td className="auActions">
+                        <button
+                          type="button"
+                          className={`auBtn auBtn--sm ${u.is_banned ? "auBtn--ok" : "auBtn--danger"}`}
+                          onClick={() => toggleBan(u)}
+                          disabled={loading}
+                        >
+                          {u.is_banned ? "Unban" : "Ban"}
+                        </button>
+
+                        <button
+                          type="button"
+                          className="auBtn auBtn--sm auBtn--ghost"
+                          onClick={() => toggleRole(u)}
+                          disabled={loading}
+                        >
+                          {u.role === "ADMIN" ? "Set USER" : "Set ADMIN"}
+                        </button>
+
+                        <button
+                          type="button"
+                          className="auBtn auBtn--sm auBtn--ghost"
+                          onClick={() => togglePlan(u)}
+                          disabled={loading}
+                        >
+                          {u.account_type === "PREMIUM" ? "Set FREE" : "Set PREMIUM"}
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+
+                {!loading && users.length === 0 && (
                   <tr>
-                    <td colSpan={6} style={{ padding: 12 }}>
-                      No users
+                    <td colSpan={6} className="auEmpty">
+                      Không có user phù hợp. Thử tìm từ khóa khác.
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
+
+            {loading && (
+              <div className="auLoadingOverlay">
+                <div className="auSpinner" />
+                <div>Loading…</div>
+              </div>
+            )}
           </div>
 
-          <div style={{ marginTop: 12, display: "flex", gap: 8, alignItems: "center" }}>
-            <button disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
-              Trước
+          <div className="auPager">
+            <button
+              className="auBtn auBtn--ghost"
+              disabled={page <= 1 || loading}
+              onClick={() => setPage((p) => p - 1)}
+              type="button"
+            >
+              <Icon name="prev" /> Trước
             </button>
-            <span>
+
+            <div className="auPager__center">
               Trang <b>{page}</b> / {meta.totalPages}
-            </span>
-            <button disabled={page >= meta.totalPages} onClick={() => setPage((p) => p + 1)}>
-              Sau
+            </div>
+
+            <button
+              className="auBtn auBtn--ghost"
+              disabled={page >= meta.totalPages || loading}
+              onClick={() => setPage((p) => p + 1)}
+              type="button"
+            >
+              Sau <Icon name="next" />
             </button>
           </div>
-        </>
-      )}
+        </section>
+      </div>
     </div>
   );
 }

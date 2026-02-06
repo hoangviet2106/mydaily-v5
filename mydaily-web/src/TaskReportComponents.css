@@ -1,0 +1,927 @@
+/* ============================
+   TASK REPORT COMPONENTS STYLES
+   ============================ */
+
+/* ============================
+   SHARED STYLES
+   ============================ */
+.reportError {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.15) 100%);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    border-radius: 20px;
+    padding: 48px;
+    text-align: center;
+    max-width: 500px;
+    margin: 40px auto;
+}
+
+.reportError__icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+}
+
+.reportError__title {
+    font-size: 24px;
+    font-weight: 800;
+    color: #ef4444;
+    margin-bottom: 12px;
+}
+
+.reportError__message {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 24px;
+}
+
+.reportError__retry {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.reportError__retry:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* ============================
+   TASK REPORT SUMMARY
+   ============================ */
+.taskReportSummary {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Summary Banner */
+.summaryBanner {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    border-radius: 20px;
+    padding: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.summaryBanner__content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.summaryBanner__icon {
+    font-size: 40px;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+}
+
+.summaryBanner__title {
+    font-size: 24px;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 4px;
+}
+
+.summaryBanner__subtitle {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.summaryBanner__progress {
+    flex: 1;
+    min-width: 200px;
+    max-width: 300px;
+}
+
+.progressBar {
+    height: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progressBar__fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    border-radius: 10px;
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progressBar__label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    text-align: right;
+}
+
+/* Stats Grid */
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+}
+
+.statCard {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 24px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.statCard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    opacity: 0.2;
+    transition: opacity 0.3s ease;
+}
+
+.statCard--blue::before {
+    background: radial-gradient(circle, #3b82f6 0%, transparent 70%);
+}
+
+.statCard--green::before {
+    background: radial-gradient(circle, #10b981 0%, transparent 70%);
+}
+
+.statCard--purple::before {
+    background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
+}
+
+.statCard--red::before {
+    background: radial-gradient(circle, #ef4444 0%, transparent 70%);
+}
+
+.statCard--orange::before {
+    background: radial-gradient(circle, #f59e0b 0%, transparent 70%);
+}
+
+.statCard--yellow::before {
+    background: radial-gradient(circle, #eab308 0%, transparent 70%);
+}
+
+.statCard:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.statCard:hover::before {
+    opacity: 0.4;
+}
+
+.statCard__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.statCard__icon {
+    font-size: 32px;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+}
+
+.statCard__trend {
+    font-size: 12px;
+    color: #10b981;
+    font-weight: 600;
+}
+
+.statCard__body {
+    position: relative;
+    z-index: 1;
+}
+
+.statCard__label {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.statCard__value {
+    font-size: 36px;
+    font-weight: 900;
+    color: white;
+    margin-bottom: 4px;
+    line-height: 1;
+}
+
+.statCard__hint {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Insights Card */
+.insightsCard {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 16px;
+    padding: 24px;
+}
+
+.insightsCard__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.insightsCard__icon {
+    font-size: 24px;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+}
+
+.insightsCard__title {
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+}
+
+.insightsCard__content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.insight {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.insight--success {
+    background: rgba(34, 197, 94, 0.15);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: #22c55e;
+}
+
+.insight--warning {
+    background: rgba(251, 146, 60, 0.15);
+    border: 1px solid rgba(251, 146, 60, 0.3);
+    color: #fb923c;
+}
+
+.insight--info {
+    background: rgba(59, 130, 246, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: #3b82f6;
+}
+
+.insight__icon {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.insight__text {
+    flex: 1;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Loading Skeleton */
+.reportSkeleton {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+}
+
+.skeletonCard {
+    height: 160px;
+    background: linear-gradient(90deg,
+            rgba(255, 255, 255, 0.05) 25%,
+            rgba(255, 255, 255, 0.1) 50%,
+            rgba(255, 255, 255, 0.05) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 16px;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* ============================
+   TASK REPORT TREND
+   ============================ */
+.taskReportTrend {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Trend Stats */
+.trendStats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.trendStat {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.3s ease;
+}
+
+.trendStat:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.trendStat--primary {
+    border-color: rgba(102, 126, 234, 0.3);
+}
+
+.trendStat--success {
+    border-color: rgba(34, 197, 94, 0.3);
+}
+
+.trendStat--info {
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+.trendStat__icon {
+    font-size: 32px;
+    flex-shrink: 0;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+}
+
+.trendStat__content {
+    flex: 1;
+}
+
+.trendStat__label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 4px;
+}
+
+.trendStat__value {
+    font-size: 28px;
+    font-weight: 900;
+    color: white;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.trendStat__avg {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Chart Card */
+.chartCard {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 28px;
+}
+
+.chartCard__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.chartCard__title {
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 4px;
+}
+
+.chartCard__subtitle {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.chartCard__legend {
+    display: flex;
+    gap: 20px;
+}
+
+.legendItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.legendItem__dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.legendItem--primary .legendItem__dot {
+    background: #667eea;
+}
+
+.legendItem--success .legendItem__dot {
+    background: #10b981;
+}
+
+.chartCard__body {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    padding: 20px 10px;
+}
+
+/* Custom Tooltip */
+.chartTooltip {
+    background: rgba(15, 15, 35, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 12px 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+}
+
+.chartTooltip__date {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.chartTooltip__item {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 4px;
+    font-size: 13px;
+}
+
+.chartTooltip__label {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.chartTooltip__value {
+    font-weight: 700;
+}
+
+/* Trend Insights */
+.trendInsights {
+    background: rgba(236, 72, 153, 0.1);
+    border: 1px solid rgba(236, 72, 153, 0.3);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    gap: 16px;
+}
+
+.trendInsights__icon {
+    font-size: 28px;
+    flex-shrink: 0;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+}
+
+.trendInsights__content {
+    flex: 1;
+}
+
+.trendInsights__title {
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 8px;
+}
+
+.trendInsights__text {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+}
+
+/* Chart Skeleton */
+.chartSkeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.chartSkeleton__header {
+    height: 60px;
+    background: linear-gradient(90deg,
+            rgba(255, 255, 255, 0.05) 25%,
+            rgba(255, 255, 255, 0.1) 50%,
+            rgba(255, 255, 255, 0.05) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 16px;
+}
+
+.chartSkeleton__chart {
+    height: 400px;
+    background: linear-gradient(90deg,
+            rgba(255, 255, 255, 0.05) 25%,
+            rgba(255, 255, 255, 0.1) 50%,
+            rgba(255, 255, 255, 0.05) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 20px;
+}
+
+/* ============================
+   TASK REPORT OVERDUE
+   ============================ */
+.taskReportOverdue {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Overdue Header */
+.overdueHeader {
+    background: linear-gradient(135deg, rgba(251, 146, 60, 0.15) 0%, rgba(249, 115, 22, 0.15) 100%);
+    border: 1px solid rgba(251, 146, 60, 0.3);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.overdueHeader__stat {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.overdueHeader__icon {
+    font-size: 40px;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+}
+
+.overdueHeader__content {
+    display: flex;
+    flex-direction: column;
+}
+
+.overdueHeader__value {
+    font-size: 36px;
+    font-weight: 900;
+    color: #fb923c;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.overdueHeader__label {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.overdueHeader__btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.overdueHeader__btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Priority Guide */
+.priorityGuide {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.priorityGuide__title {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.priorityGuide__items {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.priorityGuide__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.priorityGuide__icon {
+    font-size: 16px;
+}
+
+/* Overdue List */
+.overdueList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.overdueCard {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.overdueCard:hover {
+    transform: translateX(4px);
+    border-color: rgba(251, 146, 60, 0.4);
+    background: rgba(251, 146, 60, 0.05);
+}
+
+.overdueCard__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.overdueCard__priority {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.overdueCard__title {
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    flex: 1;
+}
+
+.overdueCard__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.overdueCard__date {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.overdueCard__dateLabel {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.overdueCard__dateValue {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+}
+
+.overdueCard__badge {
+    padding: 4px 12px;
+    background: rgba(251, 146, 60, 0.2);
+    border: 1px solid rgba(251, 146, 60, 0.4);
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fb923c;
+}
+
+/* Empty State */
+.emptyState {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(22, 163, 74, 0.15) 100%);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    border-radius: 20px;
+    padding: 48px;
+    text-align: center;
+    max-width: 600px;
+    margin: 40px auto;
+}
+
+.emptyState__icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.3));
+    animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.emptyState__title {
+    font-size: 28px;
+    font-weight: 800;
+    color: #22c55e;
+    margin-bottom: 12px;
+}
+
+.emptyState__message {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 32px;
+}
+
+.emptyState__tips {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: left;
+}
+
+.emptyState__tipTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 12px;
+}
+
+.emptyState__tipList {
+    margin: 0;
+    padding-left: 24px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    line-height: 2;
+}
+
+/* Overdue Footer */
+.overdueFooter {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    gap: 16px;
+}
+
+.overdueFooter__icon {
+    font-size: 28px;
+    flex-shrink: 0;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+}
+
+.overdueFooter__content {
+    flex: 1;
+}
+
+.overdueFooter__title {
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 4px;
+}
+
+.overdueFooter__text {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Overdue Loading */
+.overdueLoading {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.overdueLoading__card {
+    height: 100px;
+    background: linear-gradient(90deg,
+            rgba(255, 255, 255, 0.05) 25%,
+            rgba(255, 255, 255, 0.1) 50%,
+            rgba(255, 255, 255, 0.05) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 16px;
+}
+
+/* ============================
+   RESPONSIVE
+   ============================ */
+@media (max-width: 768px) {
+    .statsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .trendStats {
+        grid-template-columns: 1fr;
+    }
+
+    .summaryBanner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .summaryBanner__progress {
+        width: 100%;
+        max-width: none;
+    }
+
+    .chartCard__header {
+        flex-direction: column;
+    }
+
+    .chartCard__legend {
+        width: 100%;
+    }
+
+    .overdueHeader {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .overdueHeader__btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .priorityGuide {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .statCard__value {
+        font-size: 28px;
+    }
+
+    .trendStat__value {
+        font-size: 24px;
+    }
+
+    .overdueHeader__value {
+        font-size: 28px;
+    }
+
+    .emptyState {
+        padding: 32px 24px;
+    }
+
+    .emptyState__icon {
+        font-size: 64px;
+    }
+
+    .emptyState__title {
+        font-size: 24px;
+    }
+}

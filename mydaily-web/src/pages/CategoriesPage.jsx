@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import Modal from "../components/Modal";
-import ConfirmDialog from "../components/ConfirmDialog"; // ✅ NEW
+import ConfirmDialog from "../components/ConfirmDialog";
 import {
   createCategory,
   deleteCategory,
   fetchCategories,
   updateCategory,
 } from "../api/category";
+import { AppIcon } from "../icons"; // ✅ NEW
+import "../CategoriesPage.css";
 
 function CategoryForm({ mode, initialValue, submitting, onSubmit, onCancel }) {
   const [name, setName] = useState(initialValue?.name || "");
@@ -29,30 +31,49 @@ function CategoryForm({ mode, initialValue, submitting, onSubmit, onCancel }) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="field">
-        <label className="label">Tên loại chi phí</label>
+    <form onSubmit={handleSubmit} className="catForm">
+      <div className="catField">
+        <label className="catLabel">Tên loại chi phí</label>
         <input
-          className="input"
+          className="catInput"
           placeholder="Ví dụ: Food, Transport, Bills..."
           value={name}
           onChange={(e) => setName(e.target.value)}
           autoFocus
         />
-        <div className="hint">Gợi ý: dùng tên ngắn, nhất quán để báo cáo đẹp hơn.</div>
+        <div className="catHint">Gợi ý: dùng tên ngắn, nhất quán để báo cáo đẹp hơn.</div>
       </div>
 
-      {err ? <div className="alert">{err}</div> : null}
+      {err ? <div className="catAlert catAlert--danger">{err}</div> : null}
 
-      <div className="row" style={{ justifyContent: "flex-end", marginTop: 14 }}>
-        <button type="button" className="btn" onClick={onCancel} disabled={submitting}>
+      <div className="catForm__actions">
+        <button type="button" className="btn btn--secondary" onClick={onCancel} disabled={submitting}>
           Hủy
         </button>
-        <button type="submit" className="btn btn-primary" disabled={submitting}>
+        <button type="submit" className="btn btn--primary" disabled={submitting}>
           {submitting ? "Saving…" : mode === "edit" ? "Cập nhật" : "Thêm mới"}
         </button>
       </div>
     </form>
+  );
+}
+
+function Pill({ tone = "neutral", children }) {
+  return <span className={`catPill catPill--${tone}`}>{children}</span>;
+}
+
+function EmptyState({ onCreate }) {
+  return (
+    <div className="catEmpty">
+      <div className="catEmpty__icon">
+        <AppIcon name="categories" size={26} />
+      </div>
+      <div className="catEmpty__title">Chưa có danh mục</div>
+      <div className="catEmpty__subtitle">Tạo category mới để nhập chi tiêu nhanh hơn và báo cáo chính xác hơn.</div>
+      <button className="btn btn--primary" type="button" onClick={onCreate}>
+        <AppIcon name="add" size={16} /> Thêm danh mục đầu tiên
+      </button>
+    </div>
   );
 }
 
@@ -68,7 +89,6 @@ export default function CategoriesPage() {
   const [editing, setEditing] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
-  // ✅ NEW: confirm delete modal state
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingDelete, setPendingDelete] = useState(null); // { id, name }
   const [deleting, setDeleting] = useState(false);
@@ -137,9 +157,6 @@ export default function CategoriesPage() {
     }
   };
 
-  /**
-   * ✅ DELETE (open confirm modal instead of window.confirm)
-   */
   const onDelete = (cat) => {
     setPendingDelete({ id: cat.id, name: cat.name });
     setConfirmOpen(true);
@@ -173,88 +190,124 @@ export default function CategoriesPage() {
   };
 
   return (
-    <div className="pageWidth">
-      <div className="card pad-lg">
+    <div className="catPage">
+      <div className="dashContainer catContainer">
         {/* Header */}
-        <div className="dashHeader">
-          <div>
-            <div className="pageTitle">Danh mục</div>
-            <div className="dashDate">
-              Quản lý danh mục chi tiêu để nhập liệu nhanh và báo cáo chính xác.
+        <div className="dashHeader catHeader">
+          <div className="dashHeader__greeting">
+            <div className="dashHeader__wave">🗂️</div>
+            <div>
+              <div className="dashHeader__title">Danh mục</div>
+              <div className="dashHeader__subtitle">
+                Quản lý danh mục chi tiêu để nhập liệu nhanh và báo cáo chính xác.
+              </div>
             </div>
           </div>
 
-          <div className="pageActions">
-            <button className="btn" onClick={load} disabled={loading} type="button">
-              Tải lại trang
+          <div className="catHeader__actions">
+            <button className="btn btn--secondary" onClick={load} disabled={loading} type="button">
+              <AppIcon name="reload" size={16} /> Tải lại
             </button>
-            <button className="btn btn-primary" onClick={openCreate} type="button">
-              + Thêm mới
+            <button className="btn btn--primary" onClick={openCreate} type="button">
+              <AppIcon name="add" size={16} /> Thêm mới
             </button>
           </div>
         </div>
 
-        {error ? <div className="alert">{error}</div> : null}
+        {error ? <div className="catAlert catAlert--danger">{error}</div> : null}
 
-        {/* Toolbar */}
-        <div className="toolbar" style={{ marginTop: 10 }}>
-          <div className="toolbar__left">
-            <div className="toolbar__group">
-              <label className="label" style={{ margin: 0 }}>
-                Search
-              </label>
+        {/* KPI + Search */}
+        <div className="catTopGrid">
+          <div className="catKpi catKpi--purple">
+            <div className="catKpi__label">Tổng danh mục</div>
+            <div className="catKpi__value">{items.length}</div>
+            <div className="catKpi__hint">Số category đang có</div>
+          </div>
+
+          <div className="catKpi catKpi--pink">
+            <div className="catKpi__label">Khớp tìm kiếm</div>
+            <div className="catKpi__value">{filtered.length}</div>
+            <div className="catKpi__hint">Theo từ khóa hiện tại</div>
+          </div>
+
+          <div className="catSearchCard">
+            <div className="catSearchCard__head">
+              <div className="catSearchCard__title">
+                <AppIcon name="search" size={18} /> Tìm nhanh
+              </div>
+              <Pill tone={q.trim() ? "ok" : "neutral"}>{q.trim() ? "Filtering" : "All"}</Pill>
+            </div>
+
+            <div className="catSearchRow">
               <input
-                className="input input--sm"
+                className="catSearchInput"
                 placeholder="Tìm theo tên category…"
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                style={{ minWidth: 280 }}
               />
+              <button
+                className="btn btn--secondary"
+                type="button"
+                onClick={() => setQ("")}
+                disabled={!q.trim()}
+              >
+                <AppIcon name="clear" size={16} /> Xóa
+              </button>
             </div>
-          </div>
 
-          <div className="toolbar__right">
-            <div className="stat">
-              <div className="stat__label">Số lượng</div>
-              <div className="stat__value">{items.length}</div>
-            </div>
-            <div className="stat">
-              <div className="stat__label">Khớp</div>
-              <div className="stat__value">{filtered.length}</div>
+            <div className="catSearchHint">
+              Tip: đặt tên ngắn như <b>Food</b>, <b>Rent</b>, <b>Transport</b> để biểu đồ đẹp và dễ đọc.
             </div>
           </div>
         </div>
 
+        {/* Content */}
         {loading ? (
-          <div className="skeleton">Loading categories…</div>
-        ) : filtered.length === 0 ? (
-          <div className="empty" style={{ marginTop: 12 }}>
-            <div>
-              <div className="empty__title">No categories</div>
-              <div className="empty__subtitle">Tạo category mới để bắt đầu nhập chi tiêu.</div>
+          <div className="catLoading">
+            <div className="skeleton skeleton--hero" />
+            <div className="catLoading__grid">
+              <div className="skeleton skeleton--card" />
+              <div className="skeleton skeleton--card" />
             </div>
           </div>
+        ) : filtered.length === 0 ? (
+          <EmptyState onCreate={openCreate} />
         ) : (
-          <div className="table-scroll" style={{ marginTop: 14 }}>
-            <div className="table-wrap">
-              <table className="table table__head-sticky">
+          <div className="catTableCard">
+            <div className="catTableCard__head">
+              <div>
+                <div className="catTableCard__title">
+                  <AppIcon name="pin" size={18} /> Danh sách danh mục
+                </div>
+                <div className="catTableCard__sub">Chỉnh sửa / xoá để giữ dữ liệu gọn và chuẩn.</div>
+              </div>
+              <div className="catTableCard__meta">
+                <Pill tone="neutral">Total: {items.length}</Pill>
+                <Pill tone="ok">Match: {filtered.length}</Pill>
+              </div>
+            </div>
+
+            <div className="catTableWrap">
+              <table className="catTable">
                 <thead>
                   <tr>
                     <th>Tên loại chi phí</th>
-                    <th style={{ width: 180, textAlign: "right" }}>Hành động</th>
+                    <th style={{ width: 220, textAlign: "right" }}>Hành động</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filtered.map((c) => (
                     <tr key={c.id}>
-                      <td style={{ fontWeight: 900 }}>{c.name}</td>
+                      <td className="catNameCell">
+                        <span className="catName">{c.name}</span>
+                      </td>
                       <td style={{ textAlign: "right" }}>
-                        <div className="row" style={{ justifyContent: "flex-end" }}>
-                          <button className="btn btn-sm" onClick={() => openEdit(c)} type="button">
-                            Chỉnh sửa
+                        <div className="catRowActions">
+                          <button className="btn btn--secondary catBtnSm" onClick={() => openEdit(c)} type="button">
+                            <AppIcon name="edit" size={16} /> Chỉnh sửa
                           </button>
-                          <button className="btn btn-sm btn-danger" onClick={() => onDelete(c)} type="button">
-                            Xóa
+                          <button className="btn btn--danger catBtnSm" onClick={() => onDelete(c)} type="button">
+                            <AppIcon name="delete" size={16} /> Xóa
                           </button>
                         </div>
                       </td>
@@ -262,6 +315,15 @@ export default function CategoriesPage() {
                   ))}
                 </tbody>
               </table>
+            </div>
+
+            <div className="catTableFooter">
+              <div className="catFooterHint">
+                <AppIcon name="sparkles" size={16} /> Gợi ý: tránh tạo trùng tên để báo cáo không bị “loãng”.
+              </div>
+              <button className="btn btn--primary" type="button" onClick={openCreate}>
+                <AppIcon name="add" size={16} /> Thêm mới
+              </button>
             </div>
           </div>
         )}
@@ -281,7 +343,7 @@ export default function CategoriesPage() {
           />
         </Modal>
 
-        {/* ✅ Confirm delete modal */}
+        {/* Confirm delete modal */}
         <ConfirmDialog
           open={confirmOpen}
           title="Xoá danh mục"
