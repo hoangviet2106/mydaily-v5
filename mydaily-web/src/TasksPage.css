@@ -44,6 +44,7 @@
 
     font-family: var(--font-sans);
     color: var(--text);
+    color-scheme: dark;
 }
 
 /* ===== Page container ===== */
@@ -239,56 +240,104 @@
 
 .tasksScope.tz .tz-side {
     position: sticky;
-    top: 14px;
+    top: calc(var(--topbar-height, 70px) + 14px);
 }
 
 /* ===== Filters panel ===== */
+/* ===== Filters panel (NEW: 2-row layout) ===== */
 .tasksScope.tz .tz-filters {
-    padding: 12px;
+  padding: 12px;
 }
 
 .tasksScope.tz .tz-filterBar {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    align-items: center;
+  display: grid;
+  gap: 10px;
 }
 
+/* 2 rows */
+.tasksScope.tz .tz-filterRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tasksScope.tz .tz-filterItem {
+  min-width: 0;
+}
+
+.tasksScope.tz .tz-filterItem--grow {
+  flex: 1 1 340px;
+}
+
+/* Search */
 .tasksScope.tz .tz-search {
-    flex: 1 1 260px;
-    min-width: 220px;
+  width: 100%;
+  min-width: 240px;
 }
 
+/* Tabs (giữ style pill như cũ) */
 .tasksScope.tz .tz-seg {
-    display: inline-flex;
-    padding: 4px;
-    gap: 4px;
-    border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(255, 255, 255, 0.06);
+  display: inline-flex;
+  padding: 4px;
+  gap: 4px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .tasksScope.tz .tz-segBtn {
-    border: 0;
-    cursor: pointer;
-    padding: 8px 10px;
-    border-radius: 999px;
-    background: transparent;
-    color: rgba(255, 255, 255, 0.78);
-    font-weight: 900;
-    letter-spacing: -0.01em;
-    transition: background 180ms var(--ease), transform 180ms var(--ease), color 180ms var(--ease);
+  border: 0;
+  cursor: pointer;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.78);
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  transition: background 180ms var(--ease), transform 180ms var(--ease), color 180ms var(--ease);
 }
 
 .tasksScope.tz .tz-segBtn:hover {
-    transform: translateY(-1px);
-    background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .tasksScope.tz .tz-segBtn.isActive {
-    color: rgba(255, 255, 255, 0.95);
-    background: linear-gradient(135deg, rgba(124, 58, 237, 0.55), rgba(34, 211, 238, 0.35));
-    border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.95);
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.55), rgba(34, 211, 238, 0.35));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Actions pinned right */
+.tasksScope.tz .tz-filterActions {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+/* Bottom row groups */
+.tasksScope.tz .tz-filterGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Date inputs not too wide */
+.tasksScope.tz .tz-filterGroup .input--sm[type="date"] {
+  width: 170px;
+}
+
+/* Responsive: actions xuống dòng đẹp */
+@media (max-width: 980px) {
+  .tasksScope.tz .tz-filterActions {
+    margin-left: 0;
+    width: 100%;
+    justify-content: flex-end;
+  }
 }
 
 /* ===== Inputs / selects ===== */
@@ -328,6 +377,13 @@
     background-size: 6px 6px, 6px 6px;
     background-repeat: no-repeat;
     padding-right: 30px;
+      background-color: rgba(0,0,0,0.22);
+  color: rgba(255,255,255,0.92);
+}
+
+.tasksScope.tz select.input option {
+  background: #0b1021;
+  color: rgba(255,255,255,0.92);
 }
 
 /* textarea nicer */

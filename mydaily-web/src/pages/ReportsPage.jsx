@@ -293,19 +293,30 @@ function BudgetBanner({ comparison }) {
 }
 
 /* ===================== Table ===================== */
-function DataTable({ columns, rows, emptyText }) {
+function DataTable({ columns, rows, emptyText, dense = true }) {
   return (
-    <div className="rpTableWrap">
+    <div className={`rpTableWrap ${dense ? "rpTableWrap--dense" : ""}`}>
       <table className="rpTable">
+        <colgroup>
+          {columns.map((c) => (
+            <col key={c.key} style={c.colStyle || undefined} />
+          ))}
+        </colgroup>
+
         <thead>
           <tr>
             {columns.map((c) => (
-              <th key={c.key} style={c.thStyle || undefined}>
+              <th
+                key={c.key}
+                style={c.thStyle || undefined}
+                className={c.align === "right" ? "rpTh--right" : c.align === "center" ? "rpTh--center" : "rpTh--left"}
+              >
                 {c.title}
               </th>
             ))}
           </tr>
         </thead>
+
         <tbody>
           {!rows?.length ? (
             <tr>
@@ -317,7 +328,11 @@ function DataTable({ columns, rows, emptyText }) {
             rows.map((r, idx) => (
               <tr key={r.key || idx}>
                 {columns.map((c) => (
-                  <td key={c.key} style={c.tdStyle || undefined}>
+                  <td
+                    key={c.key}
+                    style={c.tdStyle || undefined}
+                    className={c.align === "right" ? "rpTd--right" : c.align === "center" ? "rpTd--center" : "rpTd--left"}
+                  >
                     {c.render ? c.render(r, idx) : r[c.key]}
                   </td>
                 ))}
@@ -467,17 +482,6 @@ export default function ReportsPage() {
               </div>
             </div>
 
-            <div className="rpPlan">
-              <Pill tone={isPremium ? "premium" : "neutral"}>
-                {isPremium ? (
-                  <>
-                    <AppIcon name="crown" size={16} /> PREMIUM
-                  </>
-                ) : (
-                  <>🚀 FREE</>
-                )}
-              </Pill>
-            </div>
           </div>
         </div>
 
@@ -562,28 +566,30 @@ export default function ReportsPage() {
                     <div className="statsCard__title">🧾 Bảng Breakdown</div>
                   </div>
 
-                  <DataTable
-                    emptyText="Không có dữ liệu tháng này."
-                    columns={[
-                      { key: "category", title: "Loại chi phí" },
-                      {
-                        key: "total",
-                        title: "Tổng tiền",
-                        tdStyle: { textAlign: "right", fontWeight: 800, color: "white" },
-                        render: (r) => `${formatMoney(r.total)} VNĐ`,
-                      },
-                      {
-                        key: "share",
-                        title: "Tỉ lệ",
-                        tdStyle: { textAlign: "right" },
-                        render: (r) => {
-                          const share = grandTotal > 0 ? Math.round((Number(r.total || 0) / grandTotal) * 100) : 0;
-                          return <Pill tone="neutral">{share}%</Pill>;
-                        },
-                      },
-                    ]}
-                    rows={(breakdown.rows || []).map((r) => ({ ...r, key: r.category_id }))}
-                  />
+                <DataTable
+  emptyText="Không có dữ liệu tháng này."
+  columns={[
+    { key: "category", title: "Loại chi phí", align: "left" },
+    {
+      key: "total",
+      title: "Tổng tiền",
+      align: "right",
+      colStyle: { width: "180px" },
+      render: (r) => `${formatMoney(r.total)} VNĐ`,
+    },
+    {
+      key: "share",
+      title: "Tỉ lệ",
+      align: "right",
+      colStyle: { width: "96px" },
+      render: (r) => {
+        const share = grandTotal > 0 ? Math.round((Number(r.total || 0) / grandTotal) * 100) : 0;
+        return <Pill tone="neutral">{share}%</Pill>;
+      },
+    },
+  ]}
+  rows={(breakdown.rows || []).map((r) => ({ ...r, key: r.category_id }))}
+/>
                 </div>
               </div>
             ) : null}
@@ -606,34 +612,44 @@ export default function ReportsPage() {
                     <div className="statsCard__title">📌 Chi tiết tháng</div>
                   </div>
 
-                  <DataTable
-                    columns={[
-                      { key: "time", title: "Thời gian", render: () => <span className="rpMono">{mm}/{year}</span> },
-                      {
-                        key: "budget",
-                        title: "Ngân sách",
-                        tdStyle: { textAlign: "right", fontWeight: 800, color: "white" },
-                        render: () => (comparison.limit ? `${formatMoney(comparison.limit)} VNĐ` : "—"),
-                      },
-                      {
-                        key: "actual",
-                        title: "Chi tiêu",
-                        tdStyle: { textAlign: "right", fontWeight: 800, color: "white" },
-                        render: () => `${formatMoney(comparison.actual)} VNĐ`,
-                      },
-                      {
-                        key: "status",
-                        title: "Trạng thái",
-                        render: () => {
-                          if (!comparison.budget) return <Pill tone="neutral">No budget</Pill>;
-                          if (comparison.percent >= 100) return <Pill tone="danger">Over budget</Pill>;
-                          if (comparison.percent >= 80) return <Pill tone="warn">Warning</Pill>;
-                          return <Pill tone="ok">OK</Pill>;
-                        },
-                      },
-                    ]}
-                    rows={[{ key: "row1" }]}
-                  />
+                 <DataTable
+  columns={[
+    {
+      key: "time",
+      title: "Thời gian",
+      align: "left",
+      colStyle: { width: "140px" },
+      render: () => <span className="rpMono">{mm}/{year}</span>,
+    },
+    {
+      key: "budget",
+      title: "Ngân sách",
+      align: "right",
+      colStyle: { width: "200px" },
+      render: () => (comparison.limit ? `${formatMoney(comparison.limit)} VNĐ` : "—"),
+    },
+    {
+      key: "actual",
+      title: "Chi tiêu",
+      align: "right",
+      colStyle: { width: "200px" },
+      render: () => `${formatMoney(comparison.actual)} VNĐ`,
+    },
+    {
+      key: "status",
+      title: "Trạng thái",
+      align: "right",
+      colStyle: { width: "160px" },
+      render: () => {
+        if (!comparison.budget) return <Pill tone="neutral">No budget</Pill>;
+        if (comparison.percent >= 100) return <Pill tone="danger">Over budget</Pill>;
+        if (comparison.percent >= 80) return <Pill tone="warn">Warning</Pill>;
+        return <Pill tone="ok">OK</Pill>;
+      },
+    },
+  ]}
+  rows={[{ key: "row1" }]}
+/>
 
                   {!isPremium ? <div className="rpInlineLock">🔒 Premium sẽ có gauge nâng cao + insight tự động (top category gây vượt).</div> : null}
                 </div>
@@ -664,33 +680,42 @@ export default function ReportsPage() {
                     <div className="statsCard__title">🧾 Bảng xu hướng</div>
                   </div>
 
-                  <DataTable
-                    emptyText="Không có dữ liệu."
-                    columns={[
-                      { key: "key", title: "Tháng", render: (r) => <span className="rpMono">{r.key}</span> },
-                      {
-                        key: "total",
-                        title: "Tổng tiền",
-                        tdStyle: { textAlign: "right", fontWeight: 800, color: "white" },
-                        render: (r) => `${formatMoney(r.total)} VNĐ`,
-                      },
-                      {
-                        key: "spark",
-                        title: "Chỉ số",
-                        render: (r) => {
-                          const max = Math.max(1, ...(trend.rows || []).map((x) => Number(x.total || 0)));
-                          const pct = Math.min(100, (Number(r.total || 0) / max) * 100);
-                          return (
-                            <div className="rpSpark">
-                              <div className="rpSpark__bar" style={{ width: `${pct}%` }} />
-                              <span className="rpSpark__txt">{Math.round(pct)}%</span>
-                            </div>
-                          );
-                        },
-                      },
-                    ]}
-                    rows={(trend.rows || []).map((r) => ({ ...r, key: r.key }))}
-                  />
+          <DataTable
+  emptyText="Không có dữ liệu."
+  columns={[
+    {
+      key: "key",
+      title: "Tháng",
+      align: "left",
+      colStyle: { width: "140px" },
+      render: (r) => <span className="rpMono">{r.key}</span>,
+    },
+    {
+      key: "total",
+      title: "Tổng tiền",
+      align: "right",
+      colStyle: { width: "200px" },
+      render: (r) => `${formatMoney(r.total)} VNĐ`,
+    },
+    {
+      key: "spark",
+      title: "Chỉ số",
+      align: "left",
+      render: (r) => {
+        const max = Math.max(1, ...(trend.rows || []).map((x) => Number(x.total || 0)));
+        const pct = Math.min(100, (Number(r.total || 0) / max) * 100);
+        return (
+          <div className="rpSpark">
+            <div className="rpSpark__bar" style={{ width: `${pct}%` }} />
+            <span className="rpSpark__txt">{Math.round(pct)}%</span>
+          </div>
+        );
+      },
+    },
+  ]}
+  rows={(trend.rows || []).map((r) => ({ ...r, key: r.key }))}
+/>
+
                 </div>
               </div>
             ) : null}
@@ -719,20 +744,27 @@ export default function ReportsPage() {
                     <div className="statsCard__title">🧾 Bảng theo quý</div>
                   </div>
 
-                  <DataTable
-                    emptyText="Không có dữ liệu."
-                    columns={[
-                      { key: "period", title: "Thời gian", render: (r) => <span className="rpMono">{r.period}</span> },
-                      {
-                        key: "total",
-                        title: "Tổng tiền",
-                        tdStyle: { textAlign: "right", fontWeight: 800, color: "white" },
-                        render: (r) => `${formatMoney(r.total)} VNĐ`,
-                      },
-                      { key: "note", title: "Ghi chú", render: () => <span className="rpMuted">—</span> },
-                    ]}
-                    rows={(periodic.rows || []).map((r) => ({ ...r, key: r.period }))}
-                  />
+              <DataTable
+  emptyText="Không có dữ liệu."
+  columns={[
+    {
+      key: "period",
+      title: "Thời gian",
+      align: "left",
+      colStyle: { width: "140px" },
+      render: (r) => <span className="rpMono">{r.period}</span>,
+    },
+    {
+      key: "total",
+      title: "Tổng tiền",
+      align: "right",
+      colStyle: { width: "220px" },
+      render: (r) => `${formatMoney(r.total)} VNĐ`,
+    },
+    { key: "note", title: "Ghi chú", align: "left", render: () => <span className="rpMuted">—</span> },
+  ]}
+  rows={(periodic.rows || []).map((r) => ({ ...r, key: r.period }))}
+/>
                 </div>
               </div>
             ) : null}
@@ -761,25 +793,28 @@ export default function ReportsPage() {
                     <div className="statsCard__title">📌 Bảng xếp hạng</div>
                   </div>
 
-                  <DataTable
-                    emptyText="Không có dữ liệu tháng này."
-                    columns={[
-                      { key: "category", title: "Loại chi phí" },
-                      {
-                        key: "total",
-                        title: "Tổng tiền",
-                        tdStyle: { textAlign: "right", fontWeight: 800, color: "white" },
-                        render: (r) => `${formatMoney(r.total)} VNĐ`,
-                      },
-                      {
-                        key: "rank",
-                        title: "Xếp hạng",
-                        tdStyle: { textAlign: "right" },
-                        render: (_, idx) => <Pill tone={idx === 0 ? "premium" : "neutral"}>#{idx + 1}</Pill>,
-                      },
-                    ]}
-                    rows={(topCats.rows || []).map((r) => ({ ...r, key: r.category_id }))}
-                  />
+<DataTable
+  emptyText="Không có dữ liệu tháng này."
+  columns={[
+    { key: "category", title: "Loại chi phí", align: "left" },
+    {
+      key: "total",
+      title: "Tổng tiền",
+      align: "right",
+      colStyle: { width: "200px" },
+      render: (r) => `${formatMoney(r.total)} VNĐ`,
+    },
+    {
+      key: "rank",
+      title: "Xếp hạng",
+      align: "right",
+      colStyle: { width: "120px" },
+      render: (_, idx) => <Pill tone={idx === 0 ? "premium" : "neutral"}>#{idx + 1}</Pill>,
+    },
+  ]}
+  rows={(topCats.rows || []).map((r) => ({ ...r, key: r.category_id }))}
+/>
+
                 </div>
               </div>
             ) : null}

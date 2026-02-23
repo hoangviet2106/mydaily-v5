@@ -16,6 +16,8 @@ import "./ProfilePage.css";
 import "./TaskReportsPage.css";
 import "./TaskReportComponents.css";
 import "./TasksPage.css";
+import "./PaymentPage.css";
+import "./SubscriptionsPage.css";
 
 import App from "./App.jsx";
 

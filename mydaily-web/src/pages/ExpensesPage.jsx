@@ -395,7 +395,7 @@ export default function ExpensesPage() {
         {/* FILTERS (glass bar) */}
         <div className="exFilters">
           <div className="exFilters__group">
-            <label className="exLabel exLabel--inline">Month</label>
+            <label className="exLabel exLabel--inline">Tháng</label>
             <select className="exInput exInput--sm" value={month} onChange={(e) => setMonth(e.target.value)}>
               {Array.from({ length: 12 }).map((_, i) => {
                 const m = i + 1;
@@ -407,7 +407,7 @@ export default function ExpensesPage() {
               })}
             </select>
 
-            <label className="exLabel exLabel--inline">Year</label>
+            <label className="exLabel exLabel--inline">Năm</label>
             <input
               className="exInput exInput--sm"
               value={year}
@@ -512,10 +512,12 @@ export default function ExpensesPage() {
                     topCats.slice(0, 4).map((x) => (
                       <div key={x.cid} className="exTop__row">
                         <span className="exTag">{x.name}</span>
-                        <span className="exMono">{formatMoney(x.amt)}</span>
-                        <span className="exSpark">
-                          <span className="exSpark__bar" style={{ width: `${x.pct}%` }} />
-                        </span>
+                       <div className="exTop__right">
+  <span className="exMoney">
+    {formatMoney(x.amt)} <span className="exMoney__unit">VNĐ</span>
+  </span>
+  <span className="exPctPill">{Math.round(x.pct)}%</span>
+</div>
                       </div>
                     ))
                   ) : (

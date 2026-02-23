@@ -96,10 +96,29 @@
 }
 
 /* Header */
-.lp header {
-  position: relative;
-  padding: 1.5rem 0;
-  z-index: 100;
+/* Sticky header */
+.lp header{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+
+  background: rgba(253, 251, 247, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+
+/* chừa khoảng cho header để không che hero */
+.lp{
+  padding-top: 88px; /* chỉnh theo chiều cao header thực tế */
+  scroll-padding-top: 88px;
+}
+
+/* để khi tới section không bị header che */
+.lp section[id]{
+  scroll-margin-top: 88px;
 }
 
 .lp nav {
@@ -873,4 +892,29 @@
   .lp .lp-socials {
     padding-left: 0;
   }
+}
+
+
+/* ✅ Force consistent typography system */
+.lp h1, .lp h2, .lp h3, .lp h4, .lp .logo,
+.lp .visual-card h4,
+.lp .section-header h2,
+.lp .feature-card h3,
+.lp .pricing-card h3,
+.lp .pricing-price,
+.lp-info-col h3{
+  font-family: var(--font-display) !important;
+}
+
+.lp, .lp p, .lp a, .lp li, .lp button, .lp input, .lp textarea{
+  font-family: var(--font-sans) !important;
+}
+
+/* Khi click anchor, chừa khoảng cho header */
+.lp{
+  scroll-padding-top: 90px; /* chỉnh theo chiều cao header */
+}
+
+.lp section[id]{
+  scroll-margin-top: 90px;
 }

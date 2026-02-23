@@ -8,9 +8,9 @@ import { AppIcon } from "../icons"; // ✅ NEW
 import "../TaskReportsPage.css";
 
 const TABS = [
-  { key: "summary", label: "Tổng Quan", icon: "reportsSummary", desc: "Số liệu tổng hợp", color: "purple" },
-  { key: "trend", label: "Xu Hướng", icon: "reportsTrend", desc: "Biểu đồ theo thời gian", color: "blue" },
-  { key: "overdue", label: "Trễ Hạn", icon: "reportsOverdue", desc: "Tasks quá deadline", color: "orange" },
+  { key: "summary", label: "Tổng Quan", icon: "reportsSummary", desc: "Số liệu tổng hợp", color: "purple", premiumOnly: false },
+  { key: "trend", label: "Xu Hướng", icon: "reportsTrend", desc: "Biểu đồ theo thời gian", color: "blue", premiumOnly: true },
+  { key: "overdue", label: "Trễ Hạn", icon: "reportsOverdue", desc: "Tasks quá deadline", color: "orange", premiumOnly: true },
 ];
 
 function decodeJwtPayload(token) {
@@ -173,7 +173,7 @@ export default function TaskReportsPage() {
               key={tab.key}
               active={activeTab === tab.key}
               tab={tab}
-              locked={isFree}
+              locked={isFree && tab.premiumOnly}
               onClick={() => setActiveTab(tab.key)}
             />
           ))}
@@ -214,31 +214,15 @@ export default function TaskReportsPage() {
       </div>
 
       {/* Tab Content */}
-      <div className="reportContent">
-        {isFree ? (
-          <div className="reportContentWrapper">
-            <LockedPanel onUpgrade={() => navigate("/pricing")} />
-          </div>
-        ) : (
-          <>
-            {activeTab === "summary" && (
-              <div className="reportContentWrapper">
-                <TaskReportSummary />
-              </div>
-            )}
-            {activeTab === "trend" && (
-              <div className="reportContentWrapper">
-                <TaskReportTrend />
-              </div>
-            )}
-            {activeTab === "overdue" && (
-              <div className="reportContentWrapper">
-                <TaskReportOverdue />
-              </div>
-            )}
-          </>
-        )}
-      </div>
+<div className="reportContent">
+  <div className="reportContentWrapper">
+    {activeTab === "summary" && <TaskReportSummary />}
+
+    {activeTab === "trend" && (isFree ? <LockedPanel onUpgrade={() => navigate("/pricing")} /> : <TaskReportTrend />)}
+
+    {activeTab === "overdue" && (isFree ? <LockedPanel onUpgrade={() => navigate("/pricing")} /> : <TaskReportOverdue />)}
+  </div>
+</div>
 
       {/* Footer */}
       <div className="reportFooter">

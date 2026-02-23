@@ -10,5 +10,20 @@ router.patch("/users/:id/ban", auth, requireAdmin, adminController.setBan);
 router.patch("/users/:id/role", auth, requireAdmin, adminController.setRole);
 router.patch("/users/:id/plan", auth, requireAdmin, adminController.setPlan);
 
+// ✅ NEW — List VietQR payments (PENDING by default)
+router.get(
+    "/payments",
+    auth,
+    requireAdmin,
+    adminController.listPendingVietqrPayments
+);
+
+// ✅ NEW — Approve VietQR payment
+router.post(
+    "/payments/:id/approve",
+    auth,
+    requireAdmin,
+    adminController.approveVietqrPayment
+);
 
 module.exports = router;

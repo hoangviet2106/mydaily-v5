@@ -1,7 +1,7 @@
 import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import api from "../api/axios";
-
+import logo from "../assets/mydailylogo.png";
 /* ================= Icons ================= */
 function Icon({ name }) {
   const common = { width: 20, height: 20, viewBox: "0 0 24 24", fill: "none", xmlns: "http://www.w3.org/2000/svg" };
@@ -230,9 +230,9 @@ export default function DashboardLayout() {
       <header className="topNav">
         {/* Left: Logo + Brand */}
         <div className="topNav__brand">
-          <div className="topNav__logo">
-            <Icon name="sparkles" />
-          </div>
+          <div className="topNav__logo" aria-label="MyDaily">
+  <img src={logo} alt="MyDaily logo" className="topNav__logoImg" draggable="false" />
+</div>
           <div className="topNav__brandText">
             <div className="topNav__title">MyDaily</div>
             <div className="topNav__subtitle">Sống thông minh ✨</div>
@@ -259,41 +259,53 @@ export default function DashboardLayout() {
         {/* Right: User Section */}
         <div className="topNav__user">
           {/* Plan Badge */}
-          <div className={`topNav__planBadge ${accountType === "PREMIUM" ? "topNav__planBadge--premium" : ""}`}>
-            <span className="topNav__planIcon">{accountType === "PREMIUM" ? "👑" : "🚀"}</span>
-            <span className="topNav__planText">{meLoading ? "..." : accountType}</span>
-          </div>
 
           {/* User Menu */}
           <div className="topNav__userMenu">
-            <button 
-              className="topNav__userBtn"
-              onClick={() => setShowUserDropdown(!showUserDropdown)}
-            >
-              <div className="topNav__userInfo">
-                <span className="topNav__greeting">Chào,</span>
-                <span className="topNav__userName">{meLoading ? "..." : displayName}</span>
-              </div>
-              {me?.avatar_url ? (
-                <img
-                  src={me.avatar_url}
-                  alt={displayName}
-                  className="topNav__avatar"
-                  referrerPolicy="no-referrer"
-                />
-              ) : (
-                <div className="topNav__avatar topNav__avatar--placeholder">
-                  {(displayName || "M").slice(0, 1).toUpperCase()}
-                </div>
-              )}
-              <div className="topNav__avatarStatus" />
-              <Icon name="chevronDown" />
-            </button>
+            <button
+  className="topNav__userBtn"
+  onClick={() => setShowUserDropdown(!showUserDropdown)}
+>
+  {/* User name (bạn đã bỏ chữ chào rồi) */}
+  <div className="topNav__userInfo">
+    <span className="topNav__userName">{meLoading ? "..." : displayName}</span>
+  </div>
+
+  {/* Avatar + Premium badge + Status dot */}
+  <div className="topNav__avatarWrap">
+    {/* Premium badge: chỉ hiện khi PREMIUM */}
+    {accountType === "PREMIUM" && (
+      <span className="topNav__premiumBadge" title="Premium">
+        👑
+      </span>
+    )}
+
+    {/* Avatar */}
+    {me?.avatar_url ? (
+      <img
+        src={me.avatar_url}
+        alt={displayName}
+        className="topNav__avatar"
+        referrerPolicy="no-referrer"
+      />
+    ) : (
+      <div className="topNav__avatar topNav__avatar--placeholder">
+        {(displayName || "M").slice(0, 1).toUpperCase()}
+      </div>
+    )}
+
+    {/* Status dot (nếu muốn giữ online) */}
+    {/* <span className="topNav__avatarStatus" /> */}
+  </div>
+
+  {/* Chevron */}
+  <Icon name="chevronDown" />
+</button>
 
             {/* Dropdown Menu */}
             {showUserDropdown && (
               <>
-                <div 
+                <div
                   className="topNav__dropdownOverlay"
                   onClick={() => setShowUserDropdown(false)}
                 />
@@ -316,8 +328,8 @@ export default function DashboardLayout() {
 
                   <div className="topNav__dropdownDivider" />
 
-                  <NavLink 
-                    to="/profile" 
+                  <NavLink
+                    to="/profile"
                     className="topNav__dropdownItem"
                     onClick={() => setShowUserDropdown(false)}
                   >
@@ -326,15 +338,30 @@ export default function DashboardLayout() {
                   </NavLink>
 
                   {accountType === "FREE" && (
-                    <button className="topNav__dropdownItem topNav__dropdownItem--upgrade">
+                    <button
+                      className="topNav__dropdownItem topNav__dropdownItem--upgrade"
+                      onClick={() => {
+                        setShowUserDropdown(false);
+                        navigate("/upgrade");
+                      }}
+                    >
                       <span>👑</span>
                       <span>Nâng cấp Pro</span>
                     </button>
                   )}
 
+                  <NavLink
+                    to="/subscriptions"
+                    className="topNav__dropdownItem"
+                    onClick={() => setShowUserDropdown(false)}
+                  >
+                    <span>💳</span>
+                    <span>Gói & Thanh toán</span>
+                  </NavLink>
+
                   <div className="topNav__dropdownDivider" />
 
-                  <button 
+                  <button
                     className="topNav__dropdownItem topNav__dropdownItem--danger"
                     onClick={onLogout}
                   >
@@ -349,7 +376,7 @@ export default function DashboardLayout() {
           </div>
 
           {/* Mobile Menu Button */}
-          <button 
+          <button
             className="topNav__mobileBtn"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
@@ -361,7 +388,7 @@ export default function DashboardLayout() {
       {/* Mobile Navigation Overlay */}
       {isMobileMenuOpen && (
         <>
-          <div 
+          <div
             className="mobileNavOverlay"
             onClick={() => setIsMobileMenuOpen(false)}
           />

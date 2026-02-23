@@ -17,17 +17,22 @@ export default function LandingPage() {
 
     document.querySelectorAll(".lp .fade-in-scroll").forEach((el) => observer.observe(el));
 
-    const handler = (e) => {
-      const a = e.target.closest('a[href^="#"]');
-      if (!a) return;
+ const handler = (e) => {
+  const a = e.target.closest('a[href^="#"]');
+  if (!a) return;
 
-      const href = a.getAttribute("href");
-      const target = document.querySelector(href);
-      if (!target) return;
+  const href = a.getAttribute("href");
+  const target = document.querySelector(href);
+  if (!target) return;
 
-      e.preventDefault();
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
-    };
+  e.preventDefault();
+
+  const headerEl = document.querySelector(".lp header");
+  const headerH = headerEl ? headerEl.getBoundingClientRect().height : 0;
+
+  const y = target.getBoundingClientRect().top + window.scrollY - headerH - 12; // 12px breathing space
+  window.scrollTo({ top: y, behavior: "smooth" });
+};
     document.addEventListener("click", handler);
 
     return () => {

@@ -16,8 +16,8 @@ import TaskReportsPage from "../pages/TaskReportsPage";
 import ProfilePage from "../pages/ProfilePage";
 import RequireAdmin from "../auth/RequireAdmin";
 import AdminUsersPage from "../pages/admin/AdminUsersPage";
-
-
+import PaymentPage from "../pages/PaymentPage";
+import SubscriptionsPage from "../pages/SubscriptionsPage";
 function PublicOnly({ children }) {
   const token = localStorage.getItem("token");
   if (token) return <Navigate to="/dashboard" replace />;
@@ -30,7 +30,7 @@ export default function AppRouter() {
   return (
     <Routes>
       <Route path="/"
-        element={hasToken ? <Navigate to="/dashboard" replace /> : <LandingPage />}/>
+        element={hasToken ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
       <Route path="/oauth/callback" element={<OAuthCallback />} />
 
       <Route
@@ -68,14 +68,16 @@ export default function AppRouter() {
         <Route path="/tasks" element={<TasksPage />} />
         <Route path="/task-reports" element={<TaskReportsPage />} />
         <Route path="/profile" element={<ProfilePage />} />
-          <Route
-    path="/admin/users"
-    element={
-      <RequireAdmin>
-        <AdminUsersPage />
-      </RequireAdmin>
-    }
-  />
+        <Route path="/upgrade" element={<PaymentPage />} />
+        <Route path="/subscriptions" element={<SubscriptionsPage />} />
+        <Route
+          path="/admin/users"
+          element={
+            <RequireAdmin>
+              <AdminUsersPage />
+            </RequireAdmin>
+          }
+        />
       </Route>
 
       {/* fallback */}

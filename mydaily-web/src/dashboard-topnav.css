@@ -91,20 +91,31 @@ body {
    TOP NAVIGATION BAR
    ============================ */
 .topNav {
-    height: var(--topbar-height);
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 32px;
-    gap: 32px;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  height: var(--topbar-height);
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+
+  /* quan trọng */
+  justify-content: flex-start;
+
+  padding: 0 24px;
+  gap: 16px;            /* giảm gap để đỡ “ăn ngang” */
+
+  width: 100%;
+  left: 0;
+  right: 0;
+  box-sizing: border-box;
+
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
 }
 
 /* ============================
@@ -115,19 +126,42 @@ body {
     align-items: center;
     gap: 12px;
     flex-shrink: 0;
+    flex:0 0 auto;
 }
 
 .topNav__logo {
     width: 44px;
     height: 44px;
-    background: var(--primary-gradient);
-    border-radius: var(--radius-md);
+    border-radius: 14px;
+
+    background: linear-gradient(
+        135deg,
+        rgba(102,126,234,0.25),
+        rgba(118,75,162,0.25)
+    );
+
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
-    animation: logoFloat 3s ease-in-out infinite;
+
+    border: 1px solid rgba(255,255,255,0.15);
+
+     box-shadow:
+    0 6px 22px rgba(102,126,234,0.35),
+    inset 0 0 14px rgba(255,255,255,0.06);
+}
+
+.topNav__logoImg{
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+
+  /* làm logo nổi hơn */
+  filter:
+    brightness(1.25)
+    contrast(1.25)
+    saturate(1.1)
+    drop-shadow(0 2px 6px rgba(0,0,0,0.5));
 }
 
 @keyframes logoFloat {
@@ -167,13 +201,28 @@ body {
    NAVIGATION MENU (Center)
    ============================ */
 .topNav__menu {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  flex: 1 1 auto;
+  min-width: 0;                 /* cực quan trọng */
+  display: flex;
+  align-items: center;
+
+  /* bỏ center để menu không bị kẹt giữa */
+  justify-content: flex-start;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.topNav__menuInner {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;               /* để inner không bị co méo */
+  padding: 0 10px;               /* giúp kéo trượt không dính mép */
+  width: fit-content;
+  margin: 0 auto;
 }
 
 .topNav__menu::-webkit-scrollbar {
@@ -181,16 +230,18 @@ body {
 }
 
 .topNav__menuInner {
-    display: flex;
-    align-items: center;
-    gap: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;               /* để inner không bị co méo */
+  padding: 0 8px;               /* giúp kéo trượt không dính mép */
 }
 
 .topNavLink {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 16px;
+    padding: 10px 14px;
     border-radius: var(--radius-md);
     color: var(--text-secondary);
     text-decoration: none;
@@ -247,22 +298,25 @@ body {
    USER SECTION (Right)
    ============================ */
 .topNav__user {
+    margin-left: auto;
     display: flex;
     align-items: center;
     gap: 16px;
     flex-shrink: 0;
+    flex: 0 0 auto;
 }
 
 /* Plan Badge */
-.topNav__planBadge {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-lg);
-    transition: all var(--transition-smooth);
+.topNav__premiumBadge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+
+  font-size: 12px;
+  line-height: 1;
+
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+  z-index: 2;
 }
 
 .topNav__planBadge:hover {
@@ -295,7 +349,7 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 8px 12px;
+    padding: 6px 10px;
     background: var(--bg-hover);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--radius-lg);
@@ -345,18 +399,51 @@ body {
     color: white;
 }
 
-.topNav__avatarStatus {
-    position: absolute;
-    top: 8px;
-    right: 42px;
-    width: 10px;
-    height: 10px;
-    background: var(--accent-green);
-    border: 2px solid var(--bg-secondary);
-    border-radius: 50%;
-    box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
-    animation: pulse 2s ease-in-out infinite;
+/* Wrap để đặt badge & status theo avatar, không lệch theo màn */
+.topNav__avatarWrap{
+  position: relative;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
 }
+
+/* avatar hiện tại của bạn giữ nguyên, chỉ cần full size theo wrap */
+.topNav__avatar{
+  width: 100%;
+  height: 100%;
+}
+
+/* Premium badge */
+.topNav__premiumBadge{
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+  font-size: 12px;
+  line-height: 1;
+}
+
+/* Status dot: neo vào avatar (đừng dùng right: 42px như cũ) */
+.topNav__avatarStatus {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+
+  width: 8px;
+  height: 8px;
+
+  background: var(--accent-green);
+  border-radius: 50%;
+  border: 2px solid var(--bg-secondary);
+
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+}
+
 
 @keyframes pulse {
 
@@ -755,10 +842,6 @@ body {
         height: 36px;
     }
 
-    .topNav__avatarStatus {
-        right: 38px;
-        top: 6px;
-    }
 
     .mainContent__inner {
         padding: 20px 16px;

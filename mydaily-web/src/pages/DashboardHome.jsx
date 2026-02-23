@@ -168,7 +168,7 @@ export default function DashboardHome() {
 
         <div className="quickActions__grid">
           <QuickActionCard
-            icon={<AppIcon name="quickTask" size={22} tone="purple" />}
+            icon={<AppIcon  name="add" size={22} tone="purple" />}
             title="Tạo Task Mới"
             description="Thêm công việc cần làm"
             color="purple"

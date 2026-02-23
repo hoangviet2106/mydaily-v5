@@ -17,6 +17,34 @@ enum UserRole {
   ADMIN
 }
 
+enum PaymentProvider {
+  VIETQR
+}
+
+enum ActivationSource {
+  PAYMENT
+  ADMIN
+}
+
+enum SubscriptionStatus {
+  INACTIVE
+  ACTIVE
+  CANCELED
+  EXPIRED
+}
+
+enum TxStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+enum ReconcileMethod {
+  MANUAL
+  AUTO
+}
+
 model User {
   google_id    String?         @unique
   id           String          @id @default(uuid()) @db.Char(36)
@@ -26,18 +54,22 @@ model User {
   avatar_url   String?         @db.VarChar(500)
   account_type UserAccountType @default(FREE)
 
-  role         UserRole        @default(USER)
-  is_banned    Boolean         @default(false)
-  banned_at    DateTime?       @db.DateTime(0)
+  role      UserRole  @default(USER)
+  is_banned Boolean   @default(false)
+  banned_at DateTime? @db.DateTime(0)
 
-  created_at   DateTime        @default(now()) @db.DateTime(0)
-  deleted_at   DateTime?       @db.DateTime(0)
+  created_at DateTime  @default(now()) @db.DateTime(0)
+  deleted_at DateTime? @db.DateTime(0)
 
   tasks    Task[]
   expenses Expense[]
   budgets  Budget[]
 
-  streak   UserStreak? // ✅ NEW
+  streak UserStreak? // ✅ NEW
+
+  // ✅ Opposite relations (required)
+  subscription        Subscription?        @relation("UserSubscription")
+  paymentTransactions PaymentTransaction[] @relation("UserPaymentTransactions")
 
   @@map("users")
 }
@@ -49,8 +81,8 @@ model Task {
   is_completed Boolean   @default(false)
   due_date     DateTime? @db.Date
 
-  completed_at DateTime? @db.DateTime(0) // ✅ NEW: thời điểm hoàn thành
-  updated_at   DateTime  @updatedAt @db.DateTime(0) // ✅ optional but good
+  completed_at DateTime? @db.DateTime(0)
+  updated_at   DateTime  @updatedAt @db.DateTime(0)
 
   user_id String @db.Char(36)
   user    User   @relation(fields: [user_id], references: [id])
@@ -59,7 +91,7 @@ model Task {
   deleted_at DateTime? @db.DateTime(0)
 
   @@index([user_id, is_completed])
-  @@index([user_id, completed_at]) // ✅ giúp query theo ngày
+  @@index([user_id, completed_at])
   @@map("tasks")
 }
 
@@ -112,15 +144,67 @@ model Budget {
 }
 
 model UserStreak {
-  user_id          String   @id @db.Char(36)
-  current_streak   Int      @default(0)
-  longest_streak   Int      @default(0)
-  last_streak_date DateTime? @db.Date // ✅ ngày gần nhất “chốt streak”
+  user_id          String    @id @db.Char(36)
+  current_streak   Int       @default(0)
+  longest_streak   Int       @default(0)
+  last_streak_date DateTime? @db.Date
 
-  updated_at       DateTime @updatedAt @db.DateTime(0)
-  created_at       DateTime @default(now()) @db.DateTime(0)
+  updated_at DateTime @updatedAt @db.DateTime(0)
+  created_at DateTime @default(now()) @db.DateTime(0)
 
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@map("user_streaks")
+}
+
+model Subscription {
+  id                       String             @id @default(uuid()) @db.Char(36)
+  user_id                  String             @unique @db.Char(36)
+  provider                 PaymentProvider
+  status                   SubscriptionStatus @default(INACTIVE)
+  current_period_end       DateTime?          @db.DateTime(0)
+
+  activation_source        ActivationSource   @default(PAYMENT)  // 👈 THÊM DÒNG NÀY
+
+  created_at DateTime @default(now()) @db.DateTime(0)
+  updated_at DateTime @updatedAt @db.DateTime(0)
+
+  user         User                 @relation("UserSubscription", fields: [user_id], references: [id], onDelete: Cascade)
+  transactions PaymentTransaction[]
+
+  @@map("subscriptions")
+}
+
+
+model PaymentTransaction {
+  id              String  @id @default(uuid()) @db.Char(36)
+  user_id         String  @db.Char(36)
+  subscription_id String? @db.Char(36)
+
+  provider PaymentProvider @default(VIETQR)
+
+  // nội dung chuyển khoản bạn bắt user nhập (unique để đối soát)
+  reference_code String @unique @db.VarChar(64)
+
+  amount   Int
+  currency String   @default("VND") @db.VarChar(10)
+  status   TxStatus @default(PENDING)
+
+  reconcile_method ReconcileMethod @default(MANUAL)
+  bank_code        String?         @db.VarChar(20)
+  payer_name       String?         @db.VarChar(100)
+  note             String?         @db.VarChar(255)
+
+  raw_payload Json?
+
+  created_at DateTime @default(now()) @db.DateTime(0)
+  updated_at DateTime @updatedAt @db.DateTime(0)
+
+  user         User          @relation("UserPaymentTransactions", fields: [user_id], references: [id], onDelete: Cascade)
+  subscription Subscription? @relation(fields: [subscription_id], references: [id], onDelete: SetNull)
+
+  @@index([user_id])
+  @@index([subscription_id])
+  @@index([status])
+  @@map("payment_transactions")
 }

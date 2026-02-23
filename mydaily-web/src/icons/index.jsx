@@ -94,8 +94,6 @@ export const ICONS = {
     reportsOverdue: "solar:danger-circle-bold-duotone", // hoặc icon khác bạn thích
     export: "solar:export-bold-duotone",
     analytics: "solar:chart-2-bold-duotone",
-    checkCircle: "material-symbols:check-circle-rounded",
-    trash: "material-symbols:delete-rounded", // nếu file khác dùng
     status: "solar:shield-check-bold-duotone", // hoặc "solar:bolt-bold-duotone"
 
     // Task report summary cards

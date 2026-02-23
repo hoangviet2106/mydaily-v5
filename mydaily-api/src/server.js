@@ -53,6 +53,12 @@ app.use("/categories", categoryRoutes);
 app.use("/reports", reportRoutes);
 app.use("/export", exportRoutes);
 
+const paymentRoutes = require("./routes/payment.routes");
+app.use("/payments", paymentRoutes);
+
+const subscriptionRoutes = require("./routes/subscription.routes");
+app.use("/subscriptions", subscriptionRoutes);
+
 const adminRoutes = require("./routes/admin.routes");
 app.use("/admin", adminRoutes);
 

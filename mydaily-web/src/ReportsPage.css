@@ -42,8 +42,10 @@
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 18px;
     padding: 14px;
-    min-width: 420px;
+    min-width: 0;
     backdrop-filter: blur(10px);
+      width: 520px;        /* hoặc 480–560 tuỳ bạn */
+  max-width: 100%;
 }
 
 .rpFilterCard__row {
@@ -464,40 +466,52 @@
 
 /* Table */
 .rpTableWrap {
-    margin-top: 12px;
-    overflow: auto;
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.10);
-    background: rgba(255, 255, 255, 0.03);
+  margin-top: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;              /* ✅ tránh vertical scrollbar làm lệch */
+  scrollbar-gutter: stable both-edges; /* ✅ FIX LỆCH thead/tbody khi có scrollbar */
+
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.03);
 }
 
+/* ✅ collapse để sticky header render đúng */
 .rpTable {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    min-width: 720px;
+  width: 100%;
+  border-collapse: collapse;       /* ✅ đổi từ separate */
+  table-layout: fixed;             /* ✅ luôn theo colgroup/width */
 }
 
+.rpTable th,
+.rpTable td {
+  box-sizing: border-box;          /* ✅ tránh lệch do padding */
+  padding: 12px 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* header */
 .rpTable thead th {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    background: rgba(16, 17, 34, 0.92);
-    color: rgba(255, 255, 255, 0.72);
-    padding: 12px 14px;
-    font-size: 12px;
-    text-align: left;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: rgba(16, 17, 34, 0.92);
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
 }
 
+/* body */
 .rpTable tbody td {
-    padding: 12px 14px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    color: rgba(255, 255, 255, 0.86);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.86);
 }
 
 .rpTable tbody tr:hover {
-    background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .rpTdMuted {
@@ -630,4 +644,22 @@
     .rpTabs {
         grid-template-columns: 1fr;
     }
+}
+
+
+/* alignment helpers for all DataTable */
+.rpTh--left, .rpTd--left { text-align: left; }
+.rpTh--center, .rpTd--center { text-align: center; }
+.rpTh--right, .rpTd--right { text-align: right; }
+
+/* optional: dense mode (nhìn gọn như finance app) */
+.rpTableWrap--dense .rpTable thead th { padding: 11px 14px; }
+.rpTableWrap--dense .rpTable tbody td { padding: 11px 14px; }
+
+/* keep everything in one grid line */
+.rpTable { table-layout: fixed; min-width: 0; }
+.rpTable th, .rpTable td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

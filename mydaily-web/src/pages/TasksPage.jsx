@@ -317,93 +317,99 @@ function TaskFilters({ value, onChange, onReset }) {
 
   return (
     <div className="tz-filterBar">
-      <div className="tz-search">
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <AppIcon name="search" size={18} tone="neutral" />
-          <input
-            className="input tz-searchInput"
-            placeholder="Tìm nhanh: title / keyword..."
-            value={local.q}
-            onChange={(e) => setLocal((p) => ({ ...p, q: e.target.value }))}
-          />
+      {/* ===== Row 1: Search + Tabs + Actions ===== */}
+      <div className="tz-filterRow tz-filterRow--top">
+        <div className="tz-search tz-filterItem tz-filterItem--grow">
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <AppIcon name="search" size={18} tone="neutral" />
+            <input
+              className="input tz-searchInput"
+              placeholder="Tìm nhanh: title / keyword..."
+              value={local.q}
+              onChange={(e) => setLocal((p) => ({ ...p, q: e.target.value }))}
+            />
+          </div>
+        </div>
+
+        <div className="tz-seg tz-filterItem">
+          <SegBtn active={local.status === "all"} onClick={() => setLocal((p) => ({ ...p, status: "all" }))}>
+            All
+          </SegBtn>
+          <SegBtn active={local.status === "open"} onClick={() => setLocal((p) => ({ ...p, status: "open" }))}>
+            Open
+          </SegBtn>
+          <SegBtn
+            active={local.status === "completed"}
+            onClick={() => setLocal((p) => ({ ...p, status: "completed" }))}
+          >
+            Done
+          </SegBtn>
+          <SegBtn active={local.status === "overdue"} onClick={() => setLocal((p) => ({ ...p, status: "overdue" }))}>
+            Overdue
+          </SegBtn>
+        </div>
+
+        <div className="tz-filterActions tz-filterItem">
+          <button className="btn btn-primary" type="button" onClick={apply}>
+            <AppIcon name="filter" size={16} tone="purple" /> Apply
+          </button>
+          <button className="btn btn-ghost" type="button" onClick={onReset}>
+            Reset
+          </button>
         </div>
       </div>
 
-      <div className="tz-seg">
-        <SegBtn active={local.status === "all"} onClick={() => setLocal((p) => ({ ...p, status: "all" }))}>
-          All
-        </SegBtn>
-        <SegBtn active={local.status === "open"} onClick={() => setLocal((p) => ({ ...p, status: "open" }))}>
-          Open
-        </SegBtn>
-        <SegBtn
-          active={local.status === "completed"}
-          onClick={() => setLocal((p) => ({ ...p, status: "completed" }))}
-        >
-          Done
-        </SegBtn>
-        <SegBtn active={local.status === "overdue"} onClick={() => setLocal((p) => ({ ...p, status: "overdue" }))}>
-          Overdue
-        </SegBtn>
-      </div>
+      {/* ===== Row 2: Date + Presets + Sort + Page size ===== */}
+      <div className="tz-filterRow tz-filterRow--bottom">
+        <div className="tz-filterGroup tz-filterItem">
+          <input
+            className="input input--sm"
+            type="date"
+            value={local.dueFrom || ""}
+            onChange={(e) => setLocal((p) => ({ ...p, dueFrom: e.target.value }))}
+            title="Due from"
+          />
+          <span style={{ opacity: 0.65 }}>→</span>
+          <input
+            className="input input--sm"
+            type="date"
+            value={local.dueTo || ""}
+            onChange={(e) => setLocal((p) => ({ ...p, dueTo: e.target.value }))}
+            title="Due to"
+          />
 
-      <div className="tz-row tz-wrap" style={{ gap: 10, alignItems: "center" }}>
-        <input
-          className="input input--sm"
-          type="date"
-          value={local.dueFrom || ""}
-          onChange={(e) => setLocal((p) => ({ ...p, dueFrom: e.target.value }))}
-          title="Due from"
-        />
-        <span style={{ opacity: 0.65 }}>→</span>
-        <input
-          className="input input--sm"
-          type="date"
-          value={local.dueTo || ""}
-          onChange={(e) => setLocal((p) => ({ ...p, dueTo: e.target.value }))}
-          title="Due to"
-        />
+          <button className="btn btn-sm" type="button" onClick={setToday}>
+            <AppIcon name="today" size={16} tone="blue" /> Today
+          </button>
+          <button className="btn btn-sm" type="button" onClick={setNext7Days}>
+            <AppIcon name="week" size={16} tone="pink" /> 7 days
+          </button>
+        </div>
 
-        <button className="btn btn-sm" type="button" onClick={setToday}>
-          <AppIcon name="today" size={16} tone="blue" /> Today
-        </button>
-        <button className="btn btn-sm" type="button" onClick={setNext7Days}>
-          <AppIcon name="week" size={16} tone="pink" /> 7 days
-        </button>
-      </div>
+        <div className="tz-filterGroup tz-filterItem">
+          <select
+            className="input input--sm"
+            value={local.sort}
+            onChange={(e) => setLocal((p) => ({ ...p, sort: e.target.value }))}
+            style={{ width: 180 }}
+          >
+            <option value="created_desc">Newest</option>
+            <option value="created_asc">Oldest</option>
+            <option value="due_asc">Due soon</option>
+            <option value="due_desc">Due late</option>
+          </select>
 
-      <div className="tz-row tz-wrap" style={{ gap: 10, alignItems: "center" }}>
-        <select
-          className="input input--sm"
-          value={local.sort}
-          onChange={(e) => setLocal((p) => ({ ...p, sort: e.target.value }))}
-          style={{ width: 180 }}
-        >
-          <option value="created_desc">Newest</option>
-          <option value="created_asc">Oldest</option>
-          <option value="due_asc">Due soon</option>
-          <option value="due_desc">Due late</option>
-        </select>
-
-        <select
-          className="input input--sm"
-          value={local.pageSize}
-          onChange={(e) => setLocal((p) => ({ ...p, pageSize: Number(e.target.value) }))}
-          style={{ width: 120 }}
-        >
-          <option value={10}>10 / page</option>
-          <option value={20}>20 / page</option>
-          <option value={50}>50 / page</option>
-        </select>
-      </div>
-
-      <div className="tz-row" style={{ gap: 10, marginLeft: "auto" }}>
-        <button className="btn btn-primary" type="button" onClick={apply}>
-          <AppIcon name="filter" size={16} tone="purple" /> Apply
-        </button>
-        <button className="btn btn-ghost" type="button" onClick={onReset}>
-          Reset
-        </button>
+          <select
+            className="input input--sm"
+            value={local.pageSize}
+            onChange={(e) => setLocal((p) => ({ ...p, pageSize: Number(e.target.value) }))}
+            style={{ width: 120 }}
+          >
+            <option value={10}>10 / page</option>
+            <option value={20}>20 / page</option>
+            <option value={50}>50 / page</option>
+          </select>
+        </div>
       </div>
     </div>
   );
