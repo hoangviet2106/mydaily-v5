@@ -75,6 +75,13 @@ function Icon({ name }) {
           <path {...stroke} d="M4 21v-1a7 7 0 0 1 14 0v1M18 8h3M19.5 6.5v3" />
         </svg>
       );
+    case "approveRequests":
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="12" r="9" {...stroke} />
+          <path {...stroke} d="M9 12l2 2 4-4" />
+        </svg>
+      );
     case "sparkles":
       return (
         <svg {...common}>
@@ -231,8 +238,8 @@ export default function DashboardLayout() {
         {/* Left: Logo + Brand */}
         <div className="topNav__brand">
           <div className="topNav__logo" aria-label="MyDaily">
-  <img src={logo} alt="MyDaily logo" className="topNav__logoImg" draggable="false" />
-</div>
+            <img src={logo} alt="MyDaily logo" className="topNav__logoImg" draggable="false" />
+          </div>
           <div className="topNav__brandText">
             <div className="topNav__title">MyDaily</div>
             <div className="topNav__subtitle">Sống thông minh ✨</div>
@@ -251,7 +258,10 @@ export default function DashboardLayout() {
             <TopNavLink to="/reports" icon="reports" label="Báo cáo" />
             <TopNavLink to="/export" icon="export" label="Export" />
             {me?.role === "ADMIN" && (
-              <TopNavLink to="/admin/users" icon="admin" label="Admin" />
+              <>
+                <TopNavLink to="/admin/users" icon="admin" label="Admin" />
+                <TopNavLink to="/admin/payments" icon="approveRequests" label="Yêu cầu duyệt" />
+              </>
             )}
           </div>
         </nav>
@@ -263,44 +273,44 @@ export default function DashboardLayout() {
           {/* User Menu */}
           <div className="topNav__userMenu">
             <button
-  className="topNav__userBtn"
-  onClick={() => setShowUserDropdown(!showUserDropdown)}
->
-  {/* User name (bạn đã bỏ chữ chào rồi) */}
-  <div className="topNav__userInfo">
-    <span className="topNav__userName">{meLoading ? "..." : displayName}</span>
-  </div>
+              className="topNav__userBtn"
+              onClick={() => setShowUserDropdown(!showUserDropdown)}
+            >
+              {/* User name (bạn đã bỏ chữ chào rồi) */}
+              <div className="topNav__userInfo">
+                <span className="topNav__userName">{meLoading ? "..." : displayName}</span>
+              </div>
 
-  {/* Avatar + Premium badge + Status dot */}
-  <div className="topNav__avatarWrap">
-    {/* Premium badge: chỉ hiện khi PREMIUM */}
-    {accountType === "PREMIUM" && (
-      <span className="topNav__premiumBadge" title="Premium">
-        👑
-      </span>
-    )}
+              {/* Avatar + Premium badge + Status dot */}
+              <div className="topNav__avatarWrap">
+                {/* Premium badge: chỉ hiện khi PREMIUM */}
+                {accountType === "PREMIUM" && (
+                  <span className="topNav__premiumBadge" title="Premium">
+                    👑
+                  </span>
+                )}
 
-    {/* Avatar */}
-    {me?.avatar_url ? (
-      <img
-        src={me.avatar_url}
-        alt={displayName}
-        className="topNav__avatar"
-        referrerPolicy="no-referrer"
-      />
-    ) : (
-      <div className="topNav__avatar topNav__avatar--placeholder">
-        {(displayName || "M").slice(0, 1).toUpperCase()}
-      </div>
-    )}
+                {/* Avatar */}
+                {me?.avatar_url ? (
+                  <img
+                    src={me.avatar_url}
+                    alt={displayName}
+                    className="topNav__avatar"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <div className="topNav__avatar topNav__avatar--placeholder">
+                    {(displayName || "M").slice(0, 1).toUpperCase()}
+                  </div>
+                )}
 
-    {/* Status dot (nếu muốn giữ online) */}
-    {/* <span className="topNav__avatarStatus" /> */}
-  </div>
+                {/* Status dot (nếu muốn giữ online) */}
+                {/* <span className="topNav__avatarStatus" /> */}
+              </div>
 
-  {/* Chevron */}
-  <Icon name="chevronDown" />
-</button>
+              {/* Chevron */}
+              <Icon name="chevronDown" />
+            </button>
 
             {/* Dropdown Menu */}
             {showUserDropdown && (

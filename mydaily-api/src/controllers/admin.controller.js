@@ -253,8 +253,9 @@ exports.listPendingVietqrPayments = async (req, res, next) => {
     }
 
     const where = {
-      provider: "ADMIN",
+      provider: "VIETQR",
       status,
+      note: { contains: "User clicked I paid" },
       ...(search
         ? {
           OR: [

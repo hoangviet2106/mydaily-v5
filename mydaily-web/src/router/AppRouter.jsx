@@ -18,6 +18,7 @@ import RequireAdmin from "../auth/RequireAdmin";
 import AdminUsersPage from "../pages/admin/AdminUsersPage";
 import PaymentPage from "../pages/PaymentPage";
 import SubscriptionsPage from "../pages/SubscriptionsPage";
+import AdminPaymentRequestsPage from "../pages/admin/AdminPaymentRequestsPage";
 function PublicOnly({ children }) {
   const token = localStorage.getItem("token");
   if (token) return <Navigate to="/dashboard" replace />;
@@ -70,6 +71,7 @@ export default function AppRouter() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/upgrade" element={<PaymentPage />} />
         <Route path="/subscriptions" element={<SubscriptionsPage />} />
+        <Route path="/admin/payments" element={<AdminPaymentRequestsPage />} />
         <Route
           path="/admin/users"
           element={
