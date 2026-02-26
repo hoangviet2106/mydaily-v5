@@ -47,7 +47,7 @@ export default function Login() {
       <div className="auth__wrap">
         <div className="authCard">
           <div className="authCard__brand">
-            <img src={logo} alt="MyDaily logo" className="authCard__logo" />
+            <div className="topNav__logo"><img src={logo} alt="MyDaily logo" className="authCard__logo" /></div>
             <div className="authCard__brandText">
               <div className="authCard__app">MyDaily</div>
               <div className="authCard__tag">Hỗ trợ cuộc sống thông minh</div>

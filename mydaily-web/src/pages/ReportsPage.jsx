@@ -346,6 +346,13 @@ function DataTable({ columns, rows, emptyText, dense = true }) {
 }
 
 /* ===================== Page ===================== */
+function PremiumGate({ isPremium, title, children }) {
+  if (!isPremium) {
+    return <PremiumLockCard title={title} />;
+  }
+  return children;
+}
+
 export default function ReportsPage() {
   const { accountType } = useOutletContext();
   const isPremium = accountType === "PREMIUM";
@@ -410,7 +417,14 @@ export default function ReportsPage() {
 
     return [
       { tone: "purple", iconName: "money", title: "Tổng chi tháng", value: `${formatMoney(grandTotal)} VNĐ`, sub: "Tổng chi theo tháng đang chọn" },
-      { tone: "blue", iconName: "receipt", title: "Số loại chi", value: `${catsCount}`, sub: "Số category có phát sinh chi" },
+      { tone: "blue", iconName: "categories", title: "Số loại chi", value: (
+    <span className="rpKpiValue">
+      <span className="rpKpiValue__num">{catsCount}</span>
+      <span className="rpKpiValue__unit"> loại</span>
+    </span>
+  ),
+  sub: "Số category có phát sinh chi tiêu",
+},
       { tone: "pink", iconName: "trend", title: "Tháng gần nhất", value: trend?.rows?.length ? `${formatMoney(last)} VNĐ` : "—", sub: "Total tháng gần nhất trong trend" },
       { tone: "green", iconName: "target", title: "Budget usage", value: pct === null ? "—" : `${pct}%`, sub: "Tỷ lệ dùng ngân sách (nếu có)" },
     ];
@@ -658,6 +672,7 @@ export default function ReportsPage() {
 
             {/* TREND */}
             {tab === "trend" ? (
+                <PremiumGate isPremium={isPremium} title="Trend report (Premium)">
               <div className="rpSplit">
                 <div className="statsCard statsCard--purple rpPanel">
                   <div className="statsCard__header">
@@ -718,10 +733,12 @@ export default function ReportsPage() {
 
                 </div>
               </div>
+              </PremiumGate>
             ) : null}
 
             {/* PERIODIC */}
             {tab === "periodic" ? (
+            <PremiumGate isPremium={isPremium} title="Quarter report (Premium)">
               <div className="rpSplit">
                 <div className="statsCard statsCard--purple rpPanel">
                   <div className="statsCard__header">
@@ -767,6 +784,7 @@ export default function ReportsPage() {
 />
                 </div>
               </div>
+              </PremiumGate>
             ) : null}
 
             {/* ANALYSIS */}

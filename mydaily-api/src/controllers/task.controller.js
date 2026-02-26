@@ -346,9 +346,19 @@ const getTasks = async (req, res) => {
     } else if (!where.OR) {
       where.due_date = dueWhere;
     } else {
-      // open case: OR includes due_date null OR due_date >= todayStartUTC
-      where.OR = [{ due_date: null }, { due_date: { ...(where.OR[1]?.due_date || {}), ...dueWhere } }];
-    }
+  // open case: OR includes due_date null OR due_date >= todayStartUTC
+  // Nếu user chọn dueFrom/dueTo => loại due_date null khỏi kết quả (đúng UX)
+  const hasRange = !!q.dueFrom || !!q.dueTo;
+
+  if (hasRange) {
+    where.OR = [{ due_date: { ...(where.OR?.[1]?.due_date || {}), ...dueWhere } }];
+  } else {
+    where.OR = [
+      { due_date: null },
+      { due_date: { ...(where.OR?.[1]?.due_date || {}), ...dueWhere } },
+    ];
+  }
+}
   }
 
   // sorting
@@ -407,34 +417,34 @@ const createTask = async (req, res) => {
     });
   }
 
-  // ===== Plan limit: FREE 5 tasks/day (Bangkok day) =====
-  const accountType = getAccountType(req);
-  if (accountType !== "PREMIUM") {
-    const { startUTC: from, endUTC: to } = bangkokDayRange(new Date());
+  // ===== Plan limit: FREE 7 tasks/day (Bangkok day) =====
+ const FREE_DAILY_TASK_LIMIT = 7;
+const accountType = getAccountType(req);
+if (accountType !== "PREMIUM") {
+  const { startUTC: from, endUTC: to } = bangkokDayRange(new Date());
 
-    const createdToday = await prisma.task.count({
-      where: {
-        user_id: userId,
-        deleted_at: null,
-        created_at: { gte: from, lt: to },
+  const createdToday = await prisma.task.count({
+    where: {
+      user_id: userId,
+      deleted_at: null,
+      created_at: { gte: from, lt: to },
+    },
+  });
+
+  if (createdToday >= FREE_DAILY_TASK_LIMIT) {
+    return res.status(403).json({
+      error: "LIMIT_REACHED",
+      message: `Người dùng Free chỉ được tạo tối đa ${FREE_DAILY_TASK_LIMIT} nhiệm vụ/ngày. Vui lòng nâng cấp PREMIUM để tạo không giới hạn.`,
+      meta: {
+        limit: FREE_DAILY_TASK_LIMIT,
+        used: createdToday,
+        remaining: Math.max(0, FREE_DAILY_TASK_LIMIT - createdToday),
+        resetAt: new Date(to.getTime() - 1).toISOString(),
+        today: toBangkokYMD(new Date()),
       },
     });
-
-    if (createdToday >= 5) {
-      return res.status(403).json({
-        error: "LIMIT_REACHED",
-        message: "Người dùng Free chỉ được tạo tối đa 5 nhiệm vụ/ngày. Vui lòng nâng cấp PREMIUM để tạo không giới hạn.",
-        meta: {
-          limit: 5,
-          used: createdToday,
-          remaining: Math.max(0, 5 - createdToday),
-          resetAt: new Date(to.getTime() - 1).toISOString(),
-          today: toBangkokYMD(new Date()),
-        },
-      });
-    }
   }
-
+}
   const task = await prisma.task.create({
     data: {
       id: uuid(),

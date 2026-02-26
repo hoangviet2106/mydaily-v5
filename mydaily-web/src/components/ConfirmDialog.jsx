@@ -20,7 +20,7 @@ export default function ConfirmDialog({
         <div className="modalBody">{message}</div>
 
         <div className="modalFoot">
-          <button className="btn btn-sm" type="button" onClick={onCancel} disabled={loading}>
+          <button className="btn btn-sm" type="button" onClick={onCancel} disabled={loading}  style={{color:"black"}}>
             {cancelText}
           </button>
           <button className="btn btn-sm btn-danger" type="button" onClick={onConfirm} disabled={loading}>

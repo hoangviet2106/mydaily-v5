@@ -305,9 +305,15 @@ function TaskFilters({ value, onChange, onReset }) {
 
   const setNext7Days = () => {
     const from = bangkokYMD();
-    const to = addDaysBkk(7);
+    const to = addDaysBkk(6);
     setLocal((p) => ({ ...p, dueFrom: from, dueTo: to }));
   };
+  
+  const setLast7Days = () => {
+  const to = bangkokYMD();        // hôm nay
+  const from = addDaysBkk(-6);    // 7 ngày trước
+  setLocal((p) => ({ ...p, dueFrom: from, dueTo: to }));
+};
 
   const SegBtn = ({ active, children, onClick }) => (
     <button type="button" className={`tz-segBtn ${active ? "isActive" : ""}`} onClick={onClick}>
@@ -381,8 +387,13 @@ function TaskFilters({ value, onChange, onReset }) {
           <button className="btn btn-sm" type="button" onClick={setToday}>
             <AppIcon name="today" size={16} tone="blue" /> Today
           </button>
+          
+          <button className="btn btn-sm" type="button" onClick={setLast7Days}>
+            <AppIcon name="week" size={16} tone="neutral" /> 7 ngày trước
+          </button>
+
           <button className="btn btn-sm" type="button" onClick={setNext7Days}>
-            <AppIcon name="week" size={16} tone="pink" /> 7 days
+            <AppIcon name="week" size={16} tone="pink" /> 7 ngày sau
           </button>
         </div>
 
@@ -503,7 +514,7 @@ function TaskList({ loading, items, onEdit, onDelete, onToggleComplete }) {
               ) : t.is_completed ? (
                 <div className="tz-okLine">🎉 Done! Nice work.</div>
               ) : (
-                <div className="tz-muted2">Tip: chia nhỏ 5–15 phút để dễ “done”.</div>
+                <div className="tz-muted2">Tip: Thêm thời gian cho task để hiệu quả hơn!.</div>
               )}
             </div>
           </div>
@@ -523,6 +534,7 @@ export default function TasksPage() {
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(0);
   const [streak, setStreak] = useState(null);
+  
 
   const [filters, setFilters] = useState({
     status: "all",
@@ -817,7 +829,7 @@ export default function TasksPage() {
             <ul className="tz-tipsList">
               <li>Chia task thành 5–15 phút để dễ bắt đầu.</li>
               <li>Deadline là “định hướng”, không phải “áp lực”.</li>
-              <li>Mỗi ngày xong 1 task nhỏ → streak ổn định.</li>
+              <li>Thêm thời gian trong mô tả task để làm việc hiệu quả hơn!</li>
             </ul>
           </div>
         </div>

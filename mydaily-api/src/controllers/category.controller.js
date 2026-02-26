@@ -115,22 +115,24 @@ exports.createCategory = async (req, res) => {
       });
     }
 
-    // FREE: limit 3 categories (not deleted)
-    if (user.account_type === "FREE") {
-      const count = await prisma.category.count({
-        where: { user_id: userId, deleted_at: null },
-      });
+const FREE_CATEGORY_LIMIT = 4;
 
-      if (count >= 3) {
-        return res.status(403).json({
-          error: "CATEGORY_LIMIT_REACHED",
-          message: "Người dùng Free chỉ được tạo tối đa 3 loại. Vui lòng nâng cấp PREMIUM để tạo không giới hạn.",
-          limit: 3,
-          plan: "FREE",
-          upgrade_required: true,
-        });
-      }
-    }
+// FREE: limit 4 categories (not deleted)
+if (user.account_type === "FREE") {
+  const count = await prisma.category.count({
+    where: { user_id: userId, deleted_at: null },
+  });
+
+  if (count >= FREE_CATEGORY_LIMIT) {
+    return res.status(403).json({
+      error: "CATEGORY_LIMIT_REACHED",
+      message: `Người dùng Free chỉ được tạo tối đa ${FREE_CATEGORY_LIMIT} loại. Vui lòng nâng cấp PREMIUM để tạo không giới hạn.`,
+      limit: FREE_CATEGORY_LIMIT,
+      plan: "FREE",
+      upgrade_required: true,
+    });
+  }
+}
 
     // Duplicate check
     const existing = await prisma.category.findFirst({
