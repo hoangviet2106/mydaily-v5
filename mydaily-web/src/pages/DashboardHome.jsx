@@ -11,6 +11,7 @@ export default function DashboardHome() {
   const [streak, setStreak] = useState(null);
   const [error, setError] = useState("");
   const [greeting, setGreeting] = useState("");
+  const SURVEY_URL = "https://forms.gle/5f9PiSmwNv4wwVqX7";
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -112,6 +113,14 @@ export default function DashboardHome() {
         </div>
 
         <div className="dashHeader__actions">
+          <button
+            className="btn btn--secondary"
+            onClick={() => window.open(SURVEY_URL, "_blank", "noopener,noreferrer")}
+            title="Điền form khảo sát"
+          >
+            <AppIcon name="quickReport" size={16} tone="purple" />
+            <span>Khảo sát</span>
+          </button>
           <button className="btn btn--secondary" onClick={() => navigate("/tasks")}>
             <AppIcon name="tasks" size={16} tone="blue" />
             <span>Xem Tasks</span>
@@ -168,7 +177,7 @@ export default function DashboardHome() {
 
         <div className="quickActions__grid">
           <QuickActionCard
-            icon={<AppIcon  name="add" size={22} tone="purple" />}
+            icon={<AppIcon name="add" size={22} tone="purple" />}
             title="Tạo Task Mới"
             description="Thêm công việc cần làm"
             color="purple"
