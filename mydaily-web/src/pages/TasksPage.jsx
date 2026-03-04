@@ -1,15 +1,9 @@
-// src/pages/TasksPage.jsx
+// ✅ COPY & ĐÈ TOÀN BỘ FILE: src/pages/TasksPage.jsx
 import { useEffect, useMemo, useState } from "react";
 import api from "../api/axios";
 import "../TasksPage.css";
-import { AppIcon } from "../icons"; // ✅ Iconify AppIcon
-import {
-  createTask,
-  deleteTask,
-  fetchTasks,
-  updateTask,
-  completeTask,
-} from "../api/tasks";
+import { AppIcon } from "../icons";
+import { createTask, deleteTask, fetchTasks, updateTask, completeTask } from "../api/tasks";
 
 /* =========================
    Helpers
@@ -18,36 +12,76 @@ function normalizeDateInput(v) {
   return v ? v : null;
 }
 
+/** ✅ Parse date an toàn:
+ * - dd/mm/yyyy (VN)
+ * - yyyy-mm-dd / ISO / timestamp
+ */
+function parseAnyDate(dateStr) {
+  if (!dateStr) return null;
+  if (dateStr instanceof Date) return Number.isNaN(dateStr.getTime()) ? null : dateStr;
+
+  const s = String(dateStr).trim();
+  if (!s) return null;
+
+  // dd/mm/yyyy hoặc d/m/yyyy
+  const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (m) {
+    const dd = Number(m[1]);
+    const mm = Number(m[2]) - 1;
+    const yyyy = Number(m[3]);
+    const d = new Date(yyyy, mm, dd); // local time
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
+
+  // ISO / fallback
+  const d = new Date(s);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
 function formatDateVi(d) {
-  if (!d) return "-";
-  const date = new Date(d);
-  if (Number.isNaN(date.getTime())) return "-";
+  const date = parseAnyDate(d);
+  if (!date) return "-";
   return date.toLocaleDateString("vi-VN");
+}
+
+function ymdLocal(d) {
+  const date = parseAnyDate(d);
+  if (!date) return null;
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+function todayYMD() {
+  return ymdLocal(new Date());
+}
+
+function isDueToday(task) {
+  if (!task?.due_date) return false;
+  return ymdLocal(task.due_date) === todayYMD();
 }
 
 function isOverdue(task) {
   if (task.is_completed) return false;
   if (!task.due_date) return false;
-  const due = new Date(task.due_date);
-  if (Number.isNaN(due.getTime())) return false;
+
+  const due = parseAnyDate(task.due_date);
+  if (!due) return false;
+
+  const due0 = new Date(due);
+  due0.setHours(0, 0, 0, 0);
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  due.setHours(0, 0, 0, 0);
-  return due < today;
+
+  return due0 < today;
 }
 
-function bangkokYMD(date = new Date()) {
-  const shifted = new Date(date.getTime() + 7 * 60 * 60 * 1000);
-  const y = shifted.getUTCFullYear();
-  const m = String(shifted.getUTCMonth() + 1).padStart(2, "0");
-  const d = String(shifted.getUTCDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
-}
-
-function addDaysBkk(days) {
+function addDaysLocalYMD(days) {
   const d = new Date();
   d.setDate(d.getDate() + days);
-  return bangkokYMD(d);
+  return ymdLocal(d);
 }
 
 /* =========================
@@ -112,9 +146,7 @@ function StreakWidget({ streak }) {
     <div className="streak-card tz-panel" style={{ height: "100%", padding: 14 }}>
       <div className="tz-row" style={{ alignItems: "flex-start", justifyContent: "space-between", gap: 10 }}>
         <div>
-          <div style={{ fontWeight: 900, letterSpacing: "-0.01em", fontSize: 13.5, opacity: 0.8 }}>
-            🔥 Streak
-          </div>
+          <div style={{ fontWeight: 900, letterSpacing: "-0.01em", fontSize: 13.5, opacity: 0.8 }}>🔥 Streak</div>
           <div className="streak-main" style={{ marginTop: 8 }}>
             <span className="streak-count">{current}</span> ngày liên tiếp
           </div>
@@ -177,16 +209,15 @@ function TaskDrawer({ open, mode, initialValue, submitting, onSubmit, onClose })
     setErr("");
     setTitle(initialValue?.title || "");
     setDescription(initialValue?.description || "");
-    setDueDate(initialValue?.due_date ? String(initialValue.due_date).slice(0, 10) : "");
+    // ✅ show đúng cho input type="date"
+    setDueDate(initialValue?.due_date ? (ymdLocal(initialValue.due_date) || "") : "");
   }, [open, initialValue]);
 
   const header = mode === "edit" ? "Chỉnh sửa task" : "Tạo task mới";
   const helper =
     mode === "edit" ? "Sửa gọn gàng thôi — đừng overthink." : "Tip: đặt task nhỏ + deadline nhẹ → dễ giữ streak.";
 
-  const setPreset = (daysToAdd) => {
-    setDueDate(addDaysBkk(daysToAdd));
-  };
+  const setPreset = (daysToAdd) => setDueDate(addDaysLocalYMD(daysToAdd));
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -274,9 +305,7 @@ function TaskDrawer({ open, mode, initialValue, submitting, onSubmit, onClose })
             ) : null}
           </div>
 
-          <div style={{ marginTop: 8, fontSize: 12.5, opacity: 0.75 }}>
-            Deadline giúp ưu tiên — không phải để stress.
-          </div>
+          <div style={{ marginTop: 8, fontSize: 12.5, opacity: 0.75 }}>Deadline giúp ưu tiên — không phải để stress.</div>
         </div>
 
         <div style={{ marginTop: 16, display: "flex", gap: 10, justifyContent: "flex-end" }}>
@@ -299,21 +328,21 @@ function TaskFilters({ value, onChange, onReset }) {
   const apply = () => onChange?.({ ...local, page: 1 });
 
   const setToday = () => {
-    const today = bangkokYMD();
+    const today = todayYMD();
     setLocal((p) => ({ ...p, dueFrom: today, dueTo: today }));
   };
 
   const setNext7Days = () => {
-    const from = bangkokYMD();
-    const to = addDaysBkk(6);
+    const from = todayYMD();
+    const to = addDaysLocalYMD(6);
     setLocal((p) => ({ ...p, dueFrom: from, dueTo: to }));
   };
-  
+
   const setLast7Days = () => {
-  const to = bangkokYMD();        // hôm nay
-  const from = addDaysBkk(-6);    // 7 ngày trước
-  setLocal((p) => ({ ...p, dueFrom: from, dueTo: to }));
-};
+    const to = todayYMD();
+    const from = addDaysLocalYMD(-6);
+    setLocal((p) => ({ ...p, dueFrom: from, dueTo: to }));
+  };
 
   const SegBtn = ({ active, children, onClick }) => (
     <button type="button" className={`tz-segBtn ${active ? "isActive" : ""}`} onClick={onClick}>
@@ -323,7 +352,6 @@ function TaskFilters({ value, onChange, onReset }) {
 
   return (
     <div className="tz-filterBar">
-      {/* ===== Row 1: Search + Tabs + Actions ===== */}
       <div className="tz-filterRow tz-filterRow--top">
         <div className="tz-search tz-filterItem tz-filterItem--grow">
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -344,10 +372,7 @@ function TaskFilters({ value, onChange, onReset }) {
           <SegBtn active={local.status === "open"} onClick={() => setLocal((p) => ({ ...p, status: "open" }))}>
             Open
           </SegBtn>
-          <SegBtn
-            active={local.status === "completed"}
-            onClick={() => setLocal((p) => ({ ...p, status: "completed" }))}
-          >
+          <SegBtn active={local.status === "completed"} onClick={() => setLocal((p) => ({ ...p, status: "completed" }))}>
             Done
           </SegBtn>
           <SegBtn active={local.status === "overdue"} onClick={() => setLocal((p) => ({ ...p, status: "overdue" }))}>
@@ -365,7 +390,6 @@ function TaskFilters({ value, onChange, onReset }) {
         </div>
       </div>
 
-      {/* ===== Row 2: Date + Presets + Sort + Page size ===== */}
       <div className="tz-filterRow tz-filterRow--bottom">
         <div className="tz-filterGroup tz-filterItem">
           <input
@@ -384,51 +408,34 @@ function TaskFilters({ value, onChange, onReset }) {
             title="Due to"
           />
 
+          <div className="tz-filterGroup tz-filterItem">
+            <select
+              className="input input--sm"
+              value={local.pageSize}
+              onChange={(e) => setLocal((p) => ({ ...p, pageSize: Number(e.target.value) }))}
+              style={{ width: 120 }}
+            >
+              <option value={10}>10 / page</option>
+              <option value={20}>20 / page</option>
+              <option value={50}>50 / page</option>
+            </select>
+          </div>
+
           <button className="btn btn-sm" type="button" onClick={setToday}>
             <AppIcon name="today" size={16} tone="blue" /> Today
           </button>
-          
           <button className="btn btn-sm" type="button" onClick={setLast7Days}>
             <AppIcon name="week" size={16} tone="neutral" /> 7 ngày trước
           </button>
-
           <button className="btn btn-sm" type="button" onClick={setNext7Days}>
             <AppIcon name="week" size={16} tone="pink" /> 7 ngày sau
           </button>
-        </div>
-
-        <div className="tz-filterGroup tz-filterItem">
-          <select
-            className="input input--sm"
-            value={local.sort}
-            onChange={(e) => setLocal((p) => ({ ...p, sort: e.target.value }))}
-            style={{ width: 180 }}
-          >
-            <option value="created_desc">Newest</option>
-            <option value="created_asc">Oldest</option>
-            <option value="due_asc">Due soon</option>
-            <option value="due_desc">Due late</option>
-          </select>
-
-          <select
-            className="input input--sm"
-            value={local.pageSize}
-            onChange={(e) => setLocal((p) => ({ ...p, pageSize: Number(e.target.value) }))}
-            style={{ width: 120 }}
-          >
-            <option value={10}>10 / page</option>
-            <option value={20}>20 / page</option>
-            <option value={50}>50 / page</option>
-          </select>
         </div>
       </div>
     </div>
   );
 }
 
-/* =========================
-   GenZ Task Card List (replaces table)
-   ========================= */
 function TaskList({ loading, items, onEdit, onDelete, onToggleComplete }) {
   if (loading) {
     return (
@@ -465,9 +472,18 @@ function TaskList({ loading, items, onEdit, onDelete, onToggleComplete }) {
                 <input
                   type="checkbox"
                   checked={!!t.is_completed}
-                  disabled={!!t.is_completed}
-                  onChange={() => onToggleComplete?.(t)}
-                  title={t.is_completed ? "Đã hoàn thành" : "Đánh dấu hoàn thành"}
+                  disabled={!!t.is_completed || overdue}
+                  onChange={() => {
+                    if (overdue) return;
+                    onToggleComplete?.(t);
+                  }}
+                  title={
+                    t.is_completed
+                      ? "Đã hoàn thành"
+                      : overdue
+                        ? "Task đã quá hạn — không thể tích hoàn thành"
+                        : "Đánh dấu hoàn thành"
+                  }
                 />
                 <span className="tz-checkUI" />
               </label>
@@ -507,7 +523,6 @@ function TaskList({ loading, items, onEdit, onDelete, onToggleComplete }) {
               </div>
             </div>
 
-            {/* micro footer */}
             <div className="tz-taskBottom">
               {overdue && !t.is_completed ? (
                 <div className="tz-warnLine">⚡ Trễ hạn — ưu tiên xử lý để giữ nhịp!</div>
@@ -534,7 +549,8 @@ export default function TasksPage() {
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(0);
   const [streak, setStreak] = useState(null);
-  
+
+  const [daily, setDaily] = useState({ loading: false, total: 0, completed: 0 });
 
   const [filters, setFilters] = useState({
     status: "all",
@@ -575,14 +591,35 @@ export default function TasksPage() {
       setItems(data.items || []);
       setTotal(Number(data.total || 0));
     } catch (err) {
-      const msg =
-        err?.response?.data?.message ||
-        err?.response?.data?.error ||
-        err?.message ||
-        "Failed to fetch tasks";
+      const msg = err?.response?.data?.message || err?.response?.data?.error || err?.message || "Failed to fetch tasks";
       setErr(msg);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadDailyProgress = async () => {
+    setDaily((p) => ({ ...p, loading: true }));
+    try {
+      const today = todayYMD();
+
+      // ✅ Chỉ lấy task có deadline đúng hôm nay (không phụ thuộc pagination/sort)
+      const data = await fetchTasks({
+        status: "all",
+        q: "",
+        dueFrom: today,
+        dueTo: today,
+        sort: "created_desc",
+        page: 1,
+        pageSize: 100,
+      });
+
+      const list = data.items || [];
+      const completed = list.filter((t) => t.is_completed).length;
+
+      setDaily({ loading: false, total: list.length, completed });
+    } catch {
+      setDaily({ loading: false, total: 0, completed: 0 });
     }
   };
 
@@ -602,6 +639,7 @@ export default function TasksPage() {
 
   useEffect(() => {
     loadStreak();
+    loadDailyProgress();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -637,12 +675,9 @@ export default function TasksPage() {
       setDrawerOpen(false);
       await load();
       await loadStreak();
+      await loadDailyProgress();
     } catch (err) {
-      const msg =
-        err?.response?.data?.message ||
-        err?.response?.data?.error ||
-        err?.message ||
-        "Submit failed";
+      const msg = err?.response?.data?.message || err?.response?.data?.error || err?.message || "Submit failed";
       setErr(msg);
     } finally {
       setSubmitting(false);
@@ -651,6 +686,10 @@ export default function TasksPage() {
 
   const onToggleComplete = async (task) => {
     if (task.is_completed) return;
+    if (isOverdue(task)) {
+      setErr("Task đã quá hạn nên không thể tick hoàn thành. Hãy chỉnh deadline trước.");
+      return;
+    }
 
     const snapshot = items;
     setItems((prev) => prev.map((x) => (x.id === task.id ? { ...x, is_completed: true } : x)));
@@ -659,13 +698,10 @@ export default function TasksPage() {
       const result = await completeTask(task.id);
       setItems((prev) => prev.map((x) => (x.id === task.id ? result.task : x)));
       setStreak(result.streak);
+      await loadDailyProgress();
     } catch (err) {
       setItems(snapshot);
-      const msg =
-        err?.response?.data?.message ||
-        err?.response?.data?.error ||
-        err?.message ||
-        "Update failed";
+      const msg = err?.response?.data?.message || err?.response?.data?.error || err?.message || "Update failed";
       setErr(msg);
     }
   };
@@ -690,12 +726,9 @@ export default function TasksPage() {
       closeDeleteModal();
       await load();
       await loadStreak();
+      await loadDailyProgress();
     } catch (err) {
-      const msg =
-        err?.response?.data?.message ||
-        err?.response?.data?.error ||
-        err?.message ||
-        "Delete failed";
+      const msg = err?.response?.data?.message || err?.response?.data?.error || err?.message || "Delete failed";
       setErr(msg);
     } finally {
       setDeleting(false);
@@ -704,7 +737,10 @@ export default function TasksPage() {
 
   const completedCount = items.filter((x) => x.is_completed).length;
   const openCount = items.filter((x) => !x.is_completed).length;
-  const progress = total > 0 ? Math.round((completedCount / total) * 100) : 0;
+
+  const dailyTotal = daily.total || 0;
+  const dailyCompleted = daily.completed || 0;
+  const progress = dailyTotal > 0 ? Math.round((dailyCompleted / dailyTotal) * 100) : 0;
 
   return (
     <div className="tasksScope tz tz-full">
@@ -717,17 +753,22 @@ export default function TasksPage() {
               Công việc <span className="tz-h1Sub"> tốt hơn mọi ngày</span>
             </span>
           </div>
+
           <div className="tz-heroMeta">
             <div className="tz-progress">
               <div className="tz-progressTop">
-                <span className="tz-muted2">Tiến độ</span>
-                <b>{progress}%</b>
+                <span className="tz-muted2">
+                  Tiến độ hôm nay: <span style={{ opacity: 0.6 }}>Ngày {formatDateVi(new Date())}</span>
+                </span>
+                <b>{daily.loading ? "…" : `${progress}%`}</b>
               </div>
+
               <div className="tz-progressBar">
                 <div className="tz-progressFill" style={{ width: `${progress}%` }} />
               </div>
+
               <div className="tz-muted2" style={{ marginTop: 6 }}>
-                {completedCount}/{total} tasks hoàn thành
+                {daily.loading ? "Đang tính..." : `${dailyCompleted}/${dailyTotal} task deadline hôm nay đã hoàn thành`}
               </div>
             </div>
 
@@ -806,11 +847,7 @@ export default function TasksPage() {
                 <button className="btn btn-primary" type="button" onClick={openCreate}>
                   <AppIcon name="add" size={18} tone="pink" /> Tạo task đầu tiên
                 </button>
-                <button
-                  className="btn"
-                  type="button"
-                  onClick={() => setFilters((p) => ({ ...p, status: "all", q: "", page: 1 }))}
-                >
+                <button className="btn" type="button" onClick={() => setFilters((p) => ({ ...p, status: "all", q: "", page: 1 }))}>
                   Reset filter
                 </button>
               </div>
@@ -843,9 +880,7 @@ export default function TasksPage() {
       <ConfirmDialog
         open={confirmOpen}
         title="Xoá công việc"
-        message={
-          pendingDelete?.title ? `Bạn có muốn xoá task "${pendingDelete.title}" không?` : "Bạn có muốn xoá task này không?"
-        }
+        message={pendingDelete?.title ? `Bạn có muốn xoá task "${pendingDelete.title}" không?` : "Bạn có muốn xoá task này không?"}
         confirmText="Có, xoá"
         cancelText="Không"
         loading={deleting}

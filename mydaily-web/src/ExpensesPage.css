@@ -56,12 +56,12 @@
 }
 
 .exHero__right {
-  margin-left: auto;
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+    margin-left: auto;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
 }
 
 /* Pills */
@@ -175,131 +175,138 @@
 
 /* Filters (glass bar) */
 /* ===== Filters: clean grid bar ===== */
-.exFilters{
-  margin-top: 14px;
-  padding: 14px;
-  border-radius: 22px;
-  border: 1px solid rgba(255,255,255,0.10);
-  background:
-    radial-gradient(900px 140px at 15% 0%, rgba(102,126,234,.14), transparent 60%),
-    rgba(255,255,255,0.04);
-  box-shadow: 0 18px 60px rgba(0,0,0,0.35);
-  backdrop-filter: blur(12px);
+.exFilters {
+    margin-top: 14px;
+    padding: 14px;
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    background:
+        radial-gradient(900px 140px at 15% 0%, rgba(102, 126, 234, .14), transparent 60%),
+        rgba(255, 255, 255, 0.04);
+    box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(12px);
 
-  display: grid;
-  grid-template-columns: 360px 1fr 340px;
-  gap: 12px;
-  align-items: center;
+    display: grid;
+    grid-template-columns: 360px 1fr 340px;
+    gap: 12px;
+    align-items: center;
 }
 
 /* left group: month/year */
-.exFilters__group{
-  display: grid;
-  grid-template-columns: auto 1fr auto 140px;
-  gap: 10px;
-  align-items: center;
+.exFilters__group {
+    display: grid;
+    grid-template-columns: auto 1fr auto 140px;
+    gap: 10px;
+    align-items: center;
 }
 
 /* middle group: category + search + clear */
-.exFilters__group--grow{
-  display: grid;
-  grid-template-columns: auto minmax(220px, 320px) 1fr 44px;
-  gap: 10px;
-  align-items: center;
-  min-width: 0;
+.exFilters__group--grow {
+    display: grid;
+    grid-template-columns: auto minmax(220px, 320px) 1fr 44px;
+    gap: 10px;
+    align-items: center;
+    min-width: 0;
 }
 
 /* labels inline look nicer */
-.exLabel.exLabel--inline{
-  font-size: 11px;
-  letter-spacing: .14em;
-  opacity: .75;
-  white-space: nowrap;
+.exLabel.exLabel--inline {
+    font-size: 11px;
+    letter-spacing: .14em;
+    opacity: .75;
+    white-space: nowrap;
 }
 
 /* meta KPI right */
-.exFilters__meta{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  justify-self: end;
+.exFilters__meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    justify-self: end;
 }
 
-.exStat{
-  padding: 10px 12px;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.10);
-  background: rgba(0,0,0,0.16);
+.exStat {
+    padding: 10px 12px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    background: rgba(0, 0, 0, 0.16);
 }
 
-.exStat__label{
-  font-size: 11px;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.55);
-  font-weight: 900;
+.exStat__label {
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+    font-weight: 900;
 }
 
-.exStat__value{
-  margin-top: 6px;
-  font-size: 14px;
-  font-weight: 900;
-  color: rgba(255,255,255,0.92);
+.exStat__value {
+    margin-top: 6px;
+    font-size: 14px;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.92);
 }
 
 /* Make inputs same height & nicer focus */
-.exFilters .exInput{
-  height: 44px;
-  border-radius: 14px;
-  background: rgba(0,0,0,0.18);
-  border: 1px solid rgba(255,255,255,0.12);
+.exFilters .exInput {
+    height: 44px;
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.12);
 }
-.exFilters .exInput:focus{
-  border-color: rgba(102,126,234,0.55);
-  box-shadow: 0 0 0 4px rgba(102,126,234,0.14);
+
+.exFilters .exInput:focus {
+    border-color: rgba(102, 126, 234, 0.55);
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.14);
 }
 
 /* Search wrapper (div inline style của bạn đang ok, nhưng input cần full) */
-.exFilters__group--grow input.exInput{
-  width: 100%;
+.exFilters__group--grow input.exInput {
+    width: 100%;
 }
 
 /* Clear button square nice */
-.exFilters .btn.btn--secondary.btn--sm{
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border-radius: 14px;
-  display: grid;
-  place-items: center;
+.exFilters .btn.btn--secondary.btn--sm {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
 }
 
 /* Responsive */
-@media (max-width: 1100px){
-  .exFilters{
-    grid-template-columns: 1fr;
-  }
-  .exFilters__meta{
-    justify-self: stretch;
-    grid-template-columns: 1fr 1fr;
-  }
-  .exFilters__group{
-    grid-template-columns: auto 1fr auto 160px;
-  }
-  .exFilters__group--grow{
-    grid-template-columns: auto minmax(200px, 1fr) 1fr 44px;
-  }
+@media (max-width: 1100px) {
+    .exFilters {
+        grid-template-columns: 1fr;
+    }
+
+    .exFilters__meta {
+        justify-self: stretch;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .exFilters__group {
+        grid-template-columns: auto 1fr auto 160px;
+    }
+
+    .exFilters__group--grow {
+        grid-template-columns: auto minmax(200px, 1fr) 1fr 44px;
+    }
 }
-@media (max-width: 520px){
-  .exFilters__group{
-    grid-template-columns: 1fr 1fr;
-  }
-  .exFilters__group--grow{
-    grid-template-columns: 1fr 44px;
-  }
-  .exFilters__meta{
-    grid-template-columns: 1fr;
-  }
+
+@media (max-width: 520px) {
+    .exFilters__group {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .exFilters__group--grow {
+        grid-template-columns: 1fr 44px;
+    }
+
+    .exFilters__meta {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* ================================ */
@@ -318,42 +325,42 @@
 
 /* Inputs base */
 .exInput {
-  height: 44px;
-  padding: 0 14px;
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,0.15);
-  background: rgba(255,255,255,0.06);
-  color: rgba(255,255,255,0.92);
-  outline: none;
-  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+    height: 44px;
+    padding: 0 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.92);
+    outline: none;
+    transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
 }
 
 .exInput:focus {
-  border-color: rgba(102,126,234,0.55);
-  box-shadow: 0 0 0 4px rgba(102,126,234,0.16);
+    border-color: rgba(102, 126, 234, 0.55);
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.16);
 }
 
 /* Select: ép dropdown theo dark + làm mũi tên đẹp */
 select.exInput,
 .exInput--select {
-  color-scheme: dark;
-  appearance: none;
-  padding-right: 38px;
-  background-image:
-    linear-gradient(45deg, transparent 50%, rgba(255,255,255,.65) 50%),
-    linear-gradient(135deg, rgba(255,255,255,.65) 50%, transparent 50%);
-  background-position:
-    calc(100% - 18px) 50%,
-    calc(100% - 12px) 50%;
-  background-size: 6px 6px, 6px 6px;
-  background-repeat: no-repeat;
+    color-scheme: dark;
+    appearance: none;
+    padding-right: 38px;
+    background-image:
+        linear-gradient(45deg, transparent 50%, rgba(255, 255, 255, .65) 50%),
+        linear-gradient(135deg, rgba(255, 255, 255, .65) 50%, transparent 50%);
+    background-position:
+        calc(100% - 18px) 50%,
+        calc(100% - 12px) 50%;
+    background-size: 6px 6px, 6px 6px;
+    background-repeat: no-repeat;
 }
 
 /* Option: dark */
 select.exInput option,
 .exInput--select option {
-  background: #0f1220;
-  color: rgba(255,255,255,.92);
+    background: #0f1220;
+    color: rgba(255, 255, 255, .92);
 }
 
 .exInput:focus {
@@ -498,44 +505,44 @@ select.exInput option,
     background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
 }
 
-.exTop__row{
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 12px;
-  align-items: center;
+.exTop__row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
 }
 
-.exTop__right{
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  justify-content: flex-end;
+.exTop__right {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: flex-end;
 }
 
-.exPctPill{
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 900;
-  border: 1px solid rgba(255,255,255,0.14);
-  background: rgba(255,255,255,0.06);
-  color: rgba(255,255,255,0.82);
+.exPctPill {
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 900;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.82);
 }
 
-.exMoney{
-  font-variant-numeric: tabular-nums;
-  font-weight: 900;
-  color: rgba(255,255,255,0.92);
-  text-align: right;
-  white-space: nowrap;
+.exMoney {
+    font-variant-numeric: tabular-nums;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.92);
+    text-align: right;
+    white-space: nowrap;
 }
 
-.exMoney__unit{
-  margin-left: 6px;
-  font-size: 12px;
-  font-weight: 900;
-  opacity: 0.65;
-  letter-spacing: .08em;
+.exMoney__unit {
+    margin-left: 6px;
+    font-size: 12px;
+    font-weight: 900;
+    opacity: 0.65;
+    letter-spacing: .08em;
 }
 
 /* Quick chips */
@@ -790,14 +797,15 @@ select.exInput option,
 }
 
 @media (max-width: 980px) {
-  .exHero {
-    align-items: flex-start;
-  }
-  .exHero__right {
-    width: 100%;
-    justify-content: flex-start;
-    margin-left: 0;
-  }
+    .exHero {
+        align-items: flex-start;
+    }
+
+    .exHero__right {
+        width: 100%;
+        justify-content: flex-start;
+        margin-left: 0;
+    }
 }
 
 /* ============================
@@ -1064,4 +1072,17 @@ select.exInput option,
 .exInput--select option {
     background: #0f1220;
     color: rgba(255, 255, 255, .92);
+}
+
+.exQuickCatBox {
+    padding: 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.exQuickCatRow {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
 }

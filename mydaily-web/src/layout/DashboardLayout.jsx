@@ -237,9 +237,20 @@ export default function DashboardLayout() {
       <header className="topNav">
         {/* Left: Logo + Brand */}
         <div className="topNav__brand">
-          <div className="topNav__logo" aria-label="MyDaily">
-            <img src={logo} alt="MyDaily logo" className="topNav__logoImg" draggable="false" />
-          </div>
+          <a
+            href="https://mydaily.top"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="topNav__logo"
+            aria-label="MyDaily Landing Page"
+          >
+            <img
+              src={logo}
+              alt="MyDaily logo"
+              className="topNav__logoImg"
+              draggable="false"
+            />
+          </a>
           <div className="topNav__brandText">
             <div className="topNav__title">MyDaily</div>
             <div className="topNav__subtitle">Sống thông minh ✨</div>
@@ -251,11 +262,11 @@ export default function DashboardLayout() {
           <div className="topNav__menuInner">
             <TopNavLink to="/dashboard" icon="dashboard" label="Trang chủ" />
             <TopNavLink to="/tasks" icon="tasks" label="Công việc" />
-            <TopNavLink to="/task-reports" icon="taskreports" label="Báo cáo CV" />
+            <TopNavLink to="/task-reports" icon="taskreports" label="Báo cáo công việc" />
             <TopNavLink to="/expenses" icon="expenses" label="Chi tiêu" />
             <TopNavLink to="/categories" icon="categories" label="Danh mục" />
             <TopNavLink to="/budgets" icon="budgets" label="Ngân sách" />
-            <TopNavLink to="/reports" icon="reports" label="Báo cáo" />
+            <TopNavLink to="/reports" icon="reports" label="Báo cáo tài chính" />
             <TopNavLink to="/export" icon="export" label="Export" />
             {me?.role === "ADMIN" && (
               <>

@@ -17,22 +17,22 @@ export default function LandingPage() {
 
     document.querySelectorAll(".lp .fade-in-scroll").forEach((el) => observer.observe(el));
 
- const handler = (e) => {
-  const a = e.target.closest('a[href^="#"]');
-  if (!a) return;
+    const handler = (e) => {
+      const a = e.target.closest('a[href^="#"]');
+      if (!a) return;
 
-  const href = a.getAttribute("href");
-  const target = document.querySelector(href);
-  if (!target) return;
+      const href = a.getAttribute("href");
+      const target = document.querySelector(href);
+      if (!target) return;
 
-  e.preventDefault();
+      e.preventDefault();
 
-  const headerEl = document.querySelector(".lp header");
-  const headerH = headerEl ? headerEl.getBoundingClientRect().height : 0;
+      const headerEl = document.querySelector(".lp header");
+      const headerH = headerEl ? headerEl.getBoundingClientRect().height : 0;
 
-  const y = target.getBoundingClientRect().top + window.scrollY - headerH - 12; // 12px breathing space
-  window.scrollTo({ top: y, behavior: "smooth" });
-};
+      const y = target.getBoundingClientRect().top + window.scrollY - headerH - 12; // 12px breathing space
+      window.scrollTo({ top: y, behavior: "smooth" });
+    };
     document.addEventListener("click", handler);
 
     return () => {
@@ -202,17 +202,18 @@ export default function LandingPage() {
 
         <div className="pricing-grid">
           <div className="pricing-card">
-            <div className="pricing-badge">Dành cho sinh viên</div>
+            <div className="pricing-badge">⭐ Miễn phí</div>
             <h3>Miễn phí</h3>
             <div className="pricing-price">
               0đ<span>/tháng</span>
             </div>
             <ul className="pricing-features">
-              <li>Không giới hạn công việc</li>
               <li>Theo dõi chi tiêu</li>
               <li>Ngân sách cơ bản</li>
-              <li>Báo cáo tuần</li>
-              <li>Sử dụng trên di động</li>
+              <li>Báo cáo cơ bản</li>
+              <li>Tạo công việc (7/ngày)</li>
+              <li>Tạo chi tiêu (7/ngày)</li>
+              <li>4 danh mục chi tiêu</li>
             </ul>
             <button className="pricing-btn" type="button" onClick={goLogin}>
               Dùng miễn phí
@@ -220,18 +221,20 @@ export default function LandingPage() {
           </div>
 
           <div className="pricing-card premium">
-            <div className="pricing-badge">⭐ Phổ biến nhất</div>
+            <div className="pricing-badge">💎 Premium</div>
             <h3>Premium</h3>
             <div className="pricing-price">
               49.000đ<span>/tháng</span>
             </div>
             <ul className="pricing-features">
               <li>Tất cả tính năng gói Miễn phí</li>
-              <li>Phân tích nâng cao</li>
-              <li>Danh mục tuỳ chỉnh</li>
-              <li>Theo dõi mục tiêu</li>
+              <li>Không giới hạn tạo công việc</li>
+              <li>Không giới hạn tạo chi tiêu</li>
+              <li>Không giới hạn tạo danh muc</li>
+              <li>Báo cáo chi tiết đầy đủ</li>
+              <li>Biểu đồ thống kê chi tiết</li>
+              <li>Trích xuất dữ liệu, báo cáo, thông tin</li>
               <li>Hỗ trợ ưu tiên</li>
-              <li>Xuất báo cáo</li>
             </ul>
             <button className="pricing-btn" type="button" onClick={goLogin}>
               Nâng cấp Premium
@@ -266,50 +269,48 @@ export default function LandingPage() {
           <div className="lp-info-col">
             <h3>Hỗ trợ khách hàng</h3>
             <ul>
-              <li>Email: mydaily@gmail.com</li>
-              <li>Hotline: 1800 1234</li>
+              <li>Email: mydailyexe201@gmail.com</li>
+              <li>Hotline: 037 851 8012</li>
               <li>Câu hỏi thường gặp (FAQ)</li>
               <li>Góp ý & phản hồi</li>
             </ul>
           </div>
         </div>
         <div className="lp-socials">
-          <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook">
+          <a href="https://www.facebook.com/mydaily.fpt" target="_blank" rel="noreferrer" aria-label="Facebook">
             <svg viewBox="0 0 24 24">
               <path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.7V12h2.7V9.8c0-2.7 1.6-4.2 4-4.2
         1.2 0 2.4.2 2.4.2v2.6h-1.4c-1.4 0-1.8.9-1.8 1.7V12h3.1l-.5 2.9h-2.6v7A10 10 0 0 0 22 12z"/>
             </svg>
           </a>
 
-          <a href="https://youtube.com" target="_blank" rel="noreferrer" aria-label="YouTube">
-            <svg viewBox="0 0 24 24">
-              <path d="M23.5 6.2s-.2-1.6-.9-2.3c-.8-.9-1.7-.9-2.1-1C17.6 2.5 12 2.5 12 2.5h0
-        s-5.6 0-8.5.4c-.4.1-1.3.1-2.1 1C.7 4.6.5 6.2.5 6.2S0 8.1 0 10v2
-        c0 1.9.5 3.8.5 3.8s.2 1.6.9 2.3c.8.9 1.9.9 2.4 1
-        1.7.2 7.2.4 7.2.4s5.6 0 8.5-.4c.4-.1 1.3-.1 2.1-1
-        .7-.7.9-2.3.9-2.3s.5-1.9.5-3.8v-2c0-1.9-.5-3.8-.5-3.8zM9.7 14.7V7.9l6.2 3.4-6.2 3.4z"/>
+          <a href="https://forms.gle/5f9PiSmwNv4wwVqX7" target="_blank" rel="noreferrer" aria-label="Google Form">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 
+    1.1.9 2 2 2h14c1.1 0 2-.9 
+    2-2V5c0-1.1-.9-2-2-2zm-9 
+    14H7v-2h3v2zm0-4H7v-2h3v2zm0-4H7V7h3v2zm7 
+    8h-5v-2h5v2zm0-4h-5v-2h5v2zm0-4h-5V7h5v2z"/>
             </svg>
           </a>
 
-          <a href="https://tiktok.com" target="_blank" rel="noreferrer" aria-label="TikTok">
+          <a href="https://l.facebook.com/l.php?u=https%3A%2F%2Fwww.tiktok.com%2F%40mydaily.top%3Flang%3Dvi-VN%26fbclid%3DIwZXh0bgNhZW0CMTAAYnJpZBExa0JLRXFpaFFXeUQxWWlET3NydGMGYXBwX2lkEDIyMjAzOTE3ODgyMDA4OTIAAR62ZNjguDU4tmpMDeq80DNHEH8RfPpLYlgqOTGRtfGVwrgVuDg7t_tobqoqhw_aem_jPWklL26mFNwNzhnDwdPJQ&h=AT54w_I5djhw9zVLq7p5lRJRUBVTdYDMMHiN0x7irFnvg_MLXuZTkiEnQg_nVUU7hMKLWAGq0VKpEcqADOB3_aergzr0u84iz8KvJbEuJzCDq_RqfDudP3jqYSJnrh5rWSWFriP3w8B1z04vrE_V" target="_blank" rel="noreferrer" aria-label="TikTok">
             <svg viewBox="0 0 24 24">
               <path d="M21 8.5a6.6 6.6 0 0 1-3.9-1.3v8.1a6.7 6.7 0 1 1-6.7-6.7c.2 0 .4 0 .6.1v3.5
         a3.2 3.2 0 1 0 2.8 3.1V2h3.3a6.6 6.6 0 0 0 4.3 4.2v2.3z"/>
             </svg>
           </a>
 
-          <a href="mailto:support@mydaily.app" aria-label="Gmail">
+          <a href="mydailyexe201@gmail.com" aria-label="Gmail">
             <svg viewBox="0 0 24 24">
               <path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z" />
             </svg>
           </a>
         </div>
-
       </section>
-
       {/* Footer */}
       <footer>
-        <p>© 2026 MyDaily. Đồng hành cùng bạn mỗi ngày.</p>
+        <p>© 2026 MyDaily ❤️. Đồng hành cùng bạn mỗi ngày.</p>
       </footer>
     </div>
   );

@@ -41,7 +41,7 @@ function CategoryForm({ mode, initialValue, submitting, onSubmit, onCancel }) {
           onChange={(e) => setName(e.target.value)}
           autoFocus
         />
-        <div className="catHint">Gợi ý: dùng tên ngắn, nhất quán để báo cáo đẹp hơn.</div>
+        <div className="catHint">Gợi ý: dùng tên ngắn, WIN + nút . để thêm icon.</div>
       </div>
 
       {err ? <div className="catAlert catAlert--danger">{err}</div> : null}
@@ -292,7 +292,7 @@ export default function CategoriesPage() {
                 <thead>
                   <tr>
                     <th>Tên loại chi phí</th>
-                    <th style={{ width: 220, textAlign: "right" }}>Hành động</th>
+                    <th style={{ width: 300, textAlign: "right" }}>Hành động</th>
                   </tr>
                 </thead>
                 <tbody>

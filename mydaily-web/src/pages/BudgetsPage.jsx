@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { fetchExpenses } from "../api/expenses";
 import { fetchBudgetByMonthYear, upsertBudget } from "../api/budgets";
 import { AppIcon } from "../icons"; // ✅ NEW
@@ -22,6 +22,31 @@ function toMonthYear(dateStr) {
 
 function clamp(n, min, max) {
   return Math.min(max, Math.max(min, n));
+}
+
+/** ✅ format input có dấu phẩy, chỉ cho phép số */
+function formatNumberInput(value) {
+  const digits = String(value ?? "").replace(/[^\d]/g, "");
+  if (!digits) return "";
+  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+/** ✅ bỏ dấu phẩy để parse number */
+function unformatNumberInput(value) {
+  return String(value ?? "").replace(/,/g, "");
+}
+
+/** ✅ caret helpers (giữ con trỏ không bị nhảy) */
+function countDigitsBeforePos(str, pos) {
+  return (str.slice(0, pos).match(/\d/g) || []).length;
+}
+function posAfterNDigits(formattedStr, nDigits) {
+  if (nDigits <= 0) return 0;
+  let count = 0;
+  for (let i = 0; i < formattedStr.length; i++) {
+    if (/\d/.test(formattedStr[i])) count++;
+    if (count === nDigits) return i + 1;
+  }
+  return formattedStr.length;
 }
 
 function Pill({ tone = "neutral", children }) {
@@ -99,6 +124,8 @@ export default function BudgetsPage() {
   const [budget, setBudget] = useState(null);
   const [draftAmount, setDraftAmount] = useState("");
 
+  const budgetInputRef = useRef(null);
+
   const [expenses, setExpenses] = useState([]);
 
   const actual = useMemo(() => {
@@ -121,6 +148,23 @@ export default function BudgetsPage() {
     return clamp(Math.round((actual / limit) * 100), 0, 100);
   }, [budget, limit, actual]);
 
+  const handleDraftAmountChange = (e) => {
+    const raw = e.target.value;
+    const caret = e.target.selectionStart ?? raw.length;
+
+    const digitsBefore = countDigitsBeforePos(raw, caret);
+    const formatted = formatNumberInput(raw);
+
+    setDraftAmount(formatted);
+
+    requestAnimationFrame(() => {
+      const el = budgetInputRef.current;
+      if (!el) return;
+      const nextCaret = posAfterNDigits(formatted, digitsBefore);
+      el.setSelectionRange(nextCaret, nextCaret);
+    });
+  };
+
   async function load() {
     setLoading(true);
     setError("");
@@ -139,7 +183,8 @@ export default function BudgetsPage() {
         null;
 
       setBudget(normalized ? { ...normalized, limit_amount: amt } : null);
-      setDraftAmount(amt !== null && amt !== undefined ? String(amt) : "");
+
+      setDraftAmount(amt !== null && amt !== undefined ? formatNumberInput(String(amt)) : "");
     } catch (err) {
       const msg =
         err?.response?.data?.message ||
@@ -159,7 +204,8 @@ export default function BudgetsPage() {
 
   const onSave = async () => {
     setError("");
-    const trimmed = String(draftAmount ?? "").trim();
+
+    const trimmed = unformatNumberInput(draftAmount).trim();
     const n = Number(trimmed);
 
     if (!trimmed || !Number.isFinite(n) || n <= 0) {
@@ -186,7 +232,8 @@ export default function BudgetsPage() {
         n;
 
       setBudget(normalized ? { ...normalized, limit_amount: amt } : { month, year, limit_amount: amt });
-      setDraftAmount(String(amt));
+
+      setDraftAmount(formatNumberInput(String(amt)));
     } catch (err) {
       const msg =
         err?.response?.data?.message ||
@@ -201,7 +248,9 @@ export default function BudgetsPage() {
 
   const onResetDraft = () => {
     setDraftAmount(
-      budget?.limit_amount !== undefined && budget?.limit_amount !== null ? String(budget.limit_amount) : ""
+      budget?.limit_amount !== undefined && budget?.limit_amount !== null
+        ? formatNumberInput(String(budget.limit_amount))
+        : ""
     );
     setError("");
   };
@@ -216,7 +265,9 @@ export default function BudgetsPage() {
           <div className="budHero__left">
             <div>
               <div className="budHero__title">
-                <span className="dashHeader__wave">💸</span>{" "} Ngân sách <span className="budHero__grad">thông minh</span> </div>
+                <span className="dashHeader__wave">💸</span>{" "}
+                Ngân sách <span className="budHero__grad">thông minh</span>{" "}
+              </div>
               <div className="budHero__sub">
                 Thiết lập ngân sách theo tháng, theo dõi <b>Budget vs Chi tiêu</b>, nhận cảnh báo sớm khi sắp vượt ngưỡng.
               </div>
@@ -233,7 +284,6 @@ export default function BudgetsPage() {
 
           <div className="budHero__right">
             <button className="btn btn--secondary" onClick={load} disabled={loading} type="button">
-              {/* ✅ was 🔄 */}
               <AppIcon name="reload" size={16} /> Tải lại
             </button>
           </div>
@@ -269,10 +319,11 @@ export default function BudgetsPage() {
           <div className="budEditor__group budEditor__group--grow">
             <label className="budLabel">Ngân sách</label>
             <input
+              ref={budgetInputRef}
               className="budInput"
-              placeholder="Ví dụ: 3000000"
+              placeholder="Ví dụ: 3,000,000"
               value={draftAmount}
-              onChange={(e) => setDraftAmount(e.target.value)}
+              onChange={handleDraftAmountChange}
               inputMode="numeric"
             />
 
@@ -331,7 +382,6 @@ export default function BudgetsPage() {
               <div className="budPanel">
                 <div className="budPanel__head">
                   <div className="budPanel__title">
-                    {/* ✅ was 🎯 */}
                     <AppIcon name="target" size={18} /> Mức độ sử dụng
                   </div>
                   <Pill tone={percentUsed >= 80 ? (percentUsed >= 100 ? "danger" : "warn") : "ok"}>
@@ -372,7 +422,6 @@ export default function BudgetsPage() {
               <div className="budTableCard__head">
                 <div>
                   <div className="budTableCard__title">
-                    {/* ✅ was 📌 */}
                     <AppIcon name="pin" size={18} /> Tóm tắt kỳ
                   </div>
                   <div className="budTableCard__sub">Một dòng nhìn ra trạng thái tài chính của {periodLabel}.</div>

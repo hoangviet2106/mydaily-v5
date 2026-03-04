@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Modal from "../components/Modal";
 import ConfirmDialog from "../components/ConfirmDialog";
-import { fetchCategories } from "../api/category";
+import { fetchCategories, createCategory } from "../api/category";
+import { fetchBudgetByMonthYear } from "../api/budgets"; // ✅ NEW
 import { createExpense, deleteExpense, fetchExpenses, updateExpense } from "../api/expenses";
-import { AppIcon } from "../icons"; // ✅ NEW
+import { AppIcon } from "../icons";
 import "../ExpensesPage.css";
 
 function pad2(n) {
@@ -79,7 +80,17 @@ function Chip({ active, onClick, children }) {
 }
 
 /* ======================= Form ======================= */
-function ExpenseForm({ mode, categories, initialValue, submitting, onSubmit, onCancel }) {
+function ExpenseForm({
+  mode,
+  categories,
+  initialValue,
+  submitting,
+  onSubmit,
+  onCancel,
+  onGoCategories,
+  onQuickCreateCategory,
+  creatingCategory,
+}) {
   const [amount, setAmount] = useState(initialValue?.amount ? String(initialValue.amount) : "");
   const [expenseDate, setExpenseDate] = useState(
     initialValue?.expense_date ? initialValue.expense_date.slice(0, 10) : todayISO()
@@ -102,6 +113,30 @@ function ExpenseForm({ mode, categories, initialValue, submitting, onSubmit, onC
     return `${formatMoney(n)} VNĐ`;
   }, [amount]);
 
+  const suggestedCats = useMemo(
+    () => [
+      { key: "food", label: "🍜 Ăn uống" },
+      { key: "move", label: "🚗 Đi lại" },
+      { key: "study", label: "🏠 Học tập" },
+    ],
+    []
+  );
+
+  const goCreateCategory = (presetName) => {
+    onCancel?.();
+    onGoCategories?.(presetName || "");
+  };
+
+  const handleQuickCreate = async (presetName) => {
+    setErr("");
+    try {
+      const cat = await onQuickCreateCategory?.(presetName);
+      if (cat?.id) setCategoryId(cat.id);
+    } catch (e) {
+      setErr(e?.message || "Tạo danh mục thất bại.");
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setErr("");
@@ -109,7 +144,9 @@ function ExpenseForm({ mode, categories, initialValue, submitting, onSubmit, onC
     const n = Number(amount);
     if (!Number.isFinite(n) || n <= 0) return setErr("Amount phải là số > 0.");
     if (!expenseDate) return setErr("Vui lòng chọn ngày.");
-    if (!categoryId) return setErr("Vui lòng chọn category.");
+
+    if (categories?.length && !categoryId) return setErr("Vui lòng chọn category.");
+    if (!categories?.length) return setErr("Bạn chưa có danh mục. Hãy tạo nhanh bằng các nút gợi ý hoặc tạo mới.");
 
     onSubmit?.({
       amount: n,
@@ -157,15 +194,65 @@ function ExpenseForm({ mode, categories, initialValue, submitting, onSubmit, onC
       {/* Category */}
       <div className="exField">
         <label className="exLabel">Loại chi tiêu</label>
-        <select className="exInput exInput--select" value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
-          <option value="">— Chọn loại —</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
-        <div className="exHint">Tip: chọn loại giúp báo cáo phân tích chuẩn hơn</div>
+
+        {(!categories || categories.length === 0) ? (
+          <div className="exQuickCatBox">
+            <div className="exHint" style={{ marginBottom: 10 }}>
+              Bạn chưa có danh mục nào. Bấm 1 gợi ý để tạo nhanh, hoặc tự tạo danh mục mới.
+            </div>
+
+            <div className="exQuickCatRow">
+              {suggestedCats.map((x) => (
+                <button
+                  key={x.key}
+                  type="button"
+                  className="btn btn--secondary btn--sm"
+                  onClick={() => handleQuickCreate(x.label)}
+                  disabled={submitting || creatingCategory}
+                >
+                  {creatingCategory ? "Đang tạo..." : ` ${x.label}`}
+                </button>
+              ))}
+
+              <button
+                type="button"
+                className="btn btn--primary btn--sm"
+                onClick={() => goCreateCategory("")}
+                disabled={submitting || creatingCategory}
+              >
+                Tạo danh mục mới
+              </button>
+            </div>
+
+            <div className="exHint" style={{ marginTop: 10, opacity: 0.9 }}>
+              Tip: Nếu bạn là Free, có giới hạn số danh mục. Khi chạm giới hạn, app sẽ báo để bạn nâng cấp.
+            </div>
+          </div>
+        ) : (
+          <>
+            <select
+              className="exInput exInput--select"
+              value={categoryId}
+              onChange={(e) => {
+                const v = e.target.value;
+                if (v === "__GO_CATEGORIES__") {
+                  goCreateCategory("");
+                  return;
+                }
+                setCategoryId(v);
+              }}
+            >
+              <option value=""> Loại chi tiêu</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+              <option value="__GO_CATEGORIES__">Tạo danh mục mới</option>
+            </select>
+            <div className="exHint">Tip: chọn loại giúp báo cáo phân tích chuẩn hơn</div>
+          </>
+        )}
       </div>
 
       {/* Note */}
@@ -183,11 +270,11 @@ function ExpenseForm({ mode, categories, initialValue, submitting, onSubmit, onC
       {err ? <div className="exAlert exAlert--danger exAlert--modal">{err}</div> : null}
 
       <div className="exForm__actions exForm__actions--modal">
-        <button type="button" className="btn btn--secondary" onClick={onCancel} disabled={submitting}>
+        <button type="button" className="btn btn--secondary" onClick={onCancel} disabled={submitting || creatingCategory}>
           Hủy
         </button>
-        <button type="submit" className="btn btn--primary" disabled={submitting}>
-          {submitting ? "Saving…" : mode === "edit" ? "Cập nhật" : "Thêm mới"}
+        <button type="submit" className="btn btn--primary" disabled={submitting || creatingCategory}>
+          {creatingCategory ? "Đang tạo danh mục..." : submitting ? "Saving…" : mode === "edit" ? "Cập nhật" : "Thêm mới"}
         </button>
       </div>
     </form>
@@ -197,6 +284,7 @@ function ExpenseForm({ mode, categories, initialValue, submitting, onSubmit, onC
 /* ======================= Page ======================= */
 export default function ExpensesPage() {
   const { month: nowMonth, year: nowYear } = monthStartYear();
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -223,6 +311,13 @@ export default function ExpensesPage() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingDelete, setPendingDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
+
+  // creating category state
+  const [creatingCategory, setCreatingCategory] = useState(false);
+
+  // ✅ Budget gate modal
+  const [budgetGateOpen, setBudgetGateOpen] = useState(false);
+  const [budgetGateLoading, setBudgetGateLoading] = useState(false);
 
   const catMap = useMemo(() => {
     const m = new Map();
@@ -287,10 +382,78 @@ export default function ExpensesPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const openCreate = () => {
-    setMode("create");
-    setEditing(null);
-    setOpen(true);
+  // quick create category (create + insert + return)
+  const quickCreateCategory = async (name) => {
+    const normalized = String(name || "").trim();
+    if (!normalized) throw new Error("Tên danh mục không hợp lệ.");
+
+    const existed = categories.find(
+      (c) => String(c.name || "").trim().toLowerCase() === normalized.toLowerCase()
+    );
+    if (existed) return existed;
+
+    setCreatingCategory(true);
+    try {
+      const created = await createCategory({ name: normalized });
+      setCategories((prev) => [created, ...prev]);
+      return created;
+    } catch (err) {
+      if (err?.response?.status === 409) {
+        const cats = await fetchCategories();
+        setCategories(cats || []);
+        const found = (cats || []).find(
+          (c) => String(c.name || "").trim().toLowerCase() === normalized.toLowerCase()
+        );
+        if (found) return found;
+      }
+
+      if (err?.response?.status === 403) {
+        const msg =
+          err?.response?.data?.message ||
+          "Bạn đã đạt giới hạn danh mục của gói Free. Vui lòng nâng cấp để tạo thêm.";
+        throw new Error(msg);
+      }
+
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.message ||
+        "Tạo danh mục thất bại.";
+      throw new Error(msg);
+    } finally {
+      setCreatingCategory(false);
+    }
+  };
+
+  // ✅ check budget then open create modal OR show gate
+  const requestOpenCreate = async () => {
+    // nếu đang edit thì cứ mở luôn (thực tế bạn chỉ gọi create ở button)
+    setError("");
+    setBudgetGateLoading(true);
+    try {
+      const res = await fetchBudgetByMonthYear(Number(month), Number(year));
+
+      // cố gắng đoán cấu trúc response: có thể là null / {} / {budget:null} / {id...}
+      const budgetObj = res?.budget ?? res?.data ?? res ?? null;
+      const hasBudget =
+        !!(budgetObj && (budgetObj.id || budgetObj.limit_amount || budgetObj.limitAmount || budgetObj.month));
+
+      if (!hasBudget) {
+        setBudgetGateOpen(true);
+        return;
+      }
+
+      setMode("create");
+      setEditing(null);
+      setOpen(true);
+    } catch (e) {
+      // nếu check budget lỗi -> vẫn cho tạo chi tiêu (đỡ block user)
+      setMode("create");
+      setEditing(null);
+      setOpen(true);
+    } finally {
+      setBudgetGateLoading(false);
+    }
   };
 
   const openEdit = (exp) => {
@@ -358,7 +521,6 @@ export default function ExpensesPage() {
         <div className="exHero">
           <div className="exHero__left">
             <div className="exHero__title">
-              {/* ✅ giữ icon nổi bật cố định */}
               <span className="dashHeader__wave">🧾</span>{" "}
               Chi tiêu <span className="exHero__grad">gọn gàng</span>
             </div>
@@ -382,8 +544,9 @@ export default function ExpensesPage() {
               <AppIcon name="categories" size={18} /> Danh mục
             </Link>
 
-            <button className="btn btn--primary" onClick={openCreate} type="button">
-              <AppIcon name="addExpense" size={18} /> Thêm chi tiêu
+            {/* ✅ use budget gate */}
+            <button className="btn btn--primary" onClick={requestOpenCreate} type="button" disabled={budgetGateLoading}>
+              <AppIcon name="addExpense" size={18} /> {budgetGateLoading ? "Đang kiểm tra..." : "Thêm chi tiêu"}
             </button>
           </div>
         </div>
@@ -392,7 +555,7 @@ export default function ExpensesPage() {
 
         {error ? <div className="exAlert exAlert--danger">{error}</div> : null}
 
-        {/* FILTERS (glass bar) */}
+        {/* FILTERS */}
         <div className="exFilters">
           <div className="exFilters__group">
             <label className="exLabel exLabel--inline">Tháng</label>
@@ -455,12 +618,7 @@ export default function ExpensesPage() {
               />
             </div>
 
-            <button
-              className="btn btn--secondary btn--sm"
-              type="button"
-              onClick={() => setQ("")}
-              disabled={!q.trim()}
-            >
+            <button className="btn btn--secondary btn--sm" type="button" onClick={() => setQ("")} disabled={!q.trim()}>
               <AppIcon name="clear" size={18} />
             </button>
           </div>
@@ -491,8 +649,9 @@ export default function ExpensesPage() {
           <div className="exEmpty">
             <div className="exEmpty__title">Chưa có giao dịch trong tháng này</div>
             <div className="exEmpty__sub">Thử đổi Tháng/Năm, Loại chi phí hoặc tạo chi phí mới.</div>
-            <button className="btn btn--primary" onClick={openCreate} type="button">
-              <AppIcon name="addExpense" size={18} /> Tạo chi tiêu đầu tiên
+            {/* ✅ use budget gate */}
+            <button className="btn btn--primary" onClick={requestOpenCreate} type="button" disabled={budgetGateLoading}>
+              <AppIcon name="addExpense" size={18} /> {budgetGateLoading ? "Đang kiểm tra..." : "Tạo chi tiêu đầu tiên"}
             </button>
           </div>
         ) : (
@@ -512,12 +671,12 @@ export default function ExpensesPage() {
                     topCats.slice(0, 4).map((x) => (
                       <div key={x.cid} className="exTop__row">
                         <span className="exTag">{x.name}</span>
-                       <div className="exTop__right">
-  <span className="exMoney">
-    {formatMoney(x.amt)} <span className="exMoney__unit">VNĐ</span>
-  </span>
-  <span className="exPctPill">{Math.round(x.pct)}%</span>
-</div>
+                        <div className="exTop__right">
+                          <span className="exMoney">
+                            {formatMoney(x.amt)} <span className="exMoney__unit">VNĐ</span>
+                          </span>
+                          <span className="exPctPill">{Math.round(x.pct)}%</span>
+                        </div>
                       </div>
                     ))
                   ) : (
@@ -550,10 +709,7 @@ export default function ExpensesPage() {
             <div className="exTableCard">
               <div className="exTableCard__head">
                 <div>
-                  <div className="exTableCard__title">
-                    {/* ✅ giữ "📒" vì nổi bật / brandy */}
-                    📒 Danh sách chi tiêu
-                  </div>
+                  <div className="exTableCard__title">📒 Danh sách chi tiêu</div>
                   <div className="exTableCard__sub">Sắp xếp theo dữ liệu backend (mặc định). Dùng search để lọc nhanh.</div>
                 </div>
                 <div className="exTableCard__meta">
@@ -604,7 +760,32 @@ export default function ExpensesPage() {
           </>
         )}
 
-        {/* Modal */}
+        {/* ✅ Budget Gate Modal */}
+        <Modal open={budgetGateOpen} title="Bạn chưa có ngân sách" onClose={() => setBudgetGateOpen(false)} footer={null}>
+          <div style={{ lineHeight: 1.6 }}>
+            <div style={{ opacity: 0.9, marginBottom: 12 }}>
+              Để theo dõi chi tiêu tốt hơn,  hãy tạo ngân sách trước. 👌
+            </div>
+
+            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 16 }}>
+              <button className="btn btn--secondary" type="button" onClick={() => setBudgetGateOpen(false)}>
+                Bỏ qua
+              </button>
+              <button
+                className="btn btn--primary"
+                type="button"
+                onClick={() => {
+                  setBudgetGateOpen(false);
+                  navigate(`/budgets?month=${encodeURIComponent(month)}&year=${encodeURIComponent(year)}`);
+                }}
+              >
+                Tạo ngân sách
+              </button>
+            </div>
+          </div>
+        </Modal>
+
+        {/* Modal Expense */}
         <Modal
           open={open}
           title={mode === "edit" ? "Chỉnh sửa chi tiêu" : "Thêm chi tiêu"}
@@ -618,6 +799,12 @@ export default function ExpensesPage() {
             submitting={submitting}
             onSubmit={handleSave}
             onCancel={() => setOpen(false)}
+            onGoCategories={(presetName) => {
+              const qs = presetName ? `?preset=${encodeURIComponent(presetName)}` : "";
+              navigate(`/categories${qs}`);
+            }}
+            onQuickCreateCategory={quickCreateCategory}
+            creatingCategory={creatingCategory}
           />
         </Modal>
 
