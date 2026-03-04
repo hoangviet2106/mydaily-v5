@@ -120,14 +120,14 @@ export default function ExportPage() {
 
     setDownloading(true);
     try {
-      // ✅ QUAN TRỌNG: dùng relative URL để đi qua Nginx proxy (/export/)
-      const url = endpoint; // ví dụ: /export/expenses?...
+      // ✅ Local: gọi thẳng backend
+      // ✅ Prod: gọi relative để đi qua nginx proxy (/export/)
+      const isLocal = window.location.hostname === "localhost";
+      const base = isLocal ? "http://localhost:3000" : "";
+      const url = `${base}${endpoint}`;
 
       const res = await fetch(url, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!res.ok) {
@@ -135,20 +135,21 @@ export default function ExportPage() {
         throw new Error(txt || `Export failed: ${res.status}`);
       }
 
-      // lấy filename từ header nếu server có set
       const cd = res.headers.get("content-disposition") || "";
       const match = /filename\*=UTF-8''([^;]+)|filename="?([^"]+)"?/i.exec(cd);
       const serverFilename = decodeURIComponent(match?.[1] || match?.[2] || "");
       const finalName = serverFilename || filename;
 
       const blob = await res.blob();
-      const a = document.createElement("a");
       const objectUrl = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
       a.href = objectUrl;
       a.download = finalName;
       document.body.appendChild(a);
       a.click();
       a.remove();
+
       window.URL.revokeObjectURL(objectUrl);
 
       setSuccess(true);
