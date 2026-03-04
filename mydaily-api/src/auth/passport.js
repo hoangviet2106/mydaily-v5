@@ -47,7 +47,15 @@ module.exports = function initPassport() {
 
             if (!user.google_id) dataToUpdate.google_id = googleId;
             if (avatarUrl && user.avatar_url !== avatarUrl) dataToUpdate.avatar_url = avatarUrl;
-            if (name && user.name !== name) dataToUpdate.name = name;
+            const currentName = (user.name || "").trim();
+
+            // Chỉ set name từ Google nếu DB đang trống hoặc là tên mặc định
+            const shouldSyncNameFromGoogle =
+              !currentName || currentName === "Google User";
+
+            if (shouldSyncNameFromGoogle && name && user.name !== name) {
+              dataToUpdate.name = name;
+            }
 
             if (Object.keys(dataToUpdate).length > 0) {
               user = await prisma.user.update({
