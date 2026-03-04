@@ -114,14 +114,20 @@ export default function ExportPage() {
     setError("");
     setSuccess(false);
 
+    const token = localStorage.getItem("token");
     if (!token) return setError("Bạn chưa đăng nhập.");
     if (!canExport) return setError("Tính năng Export chỉ dành cho Premium.");
 
     setDownloading(true);
     try {
-      const url = `http://localhost:3000${endpoint}`;
+      // ✅ QUAN TRỌNG: dùng relative URL để đi qua Nginx proxy (/export/)
+      const url = endpoint; // ví dụ: /export/expenses?...
+
       const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}` },
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!res.ok) {
@@ -129,11 +135,17 @@ export default function ExportPage() {
         throw new Error(txt || `Export failed: ${res.status}`);
       }
 
+      // lấy filename từ header nếu server có set
+      const cd = res.headers.get("content-disposition") || "";
+      const match = /filename\*=UTF-8''([^;]+)|filename="?([^"]+)"?/i.exec(cd);
+      const serverFilename = decodeURIComponent(match?.[1] || match?.[2] || "");
+      const finalName = serverFilename || filename;
+
       const blob = await res.blob();
       const a = document.createElement("a");
       const objectUrl = window.URL.createObjectURL(blob);
       a.href = objectUrl;
-      a.download = filename;
+      a.download = finalName;
       document.body.appendChild(a);
       a.click();
       a.remove();
