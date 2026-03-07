@@ -1,20 +1,23 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { fetchExpenses } from "../api/expenses";
 import { fetchBudgetByMonthYear, upsertBudget } from "../api/budgets";
-import { AppIcon } from "../icons"; // ✅ NEW
+import { AppIcon } from "../icons";
 import "../BudgetsPage.css";
 
 function pad2(n) {
   return String(n).padStart(2, "0");
 }
+
 function monthStartYear() {
   const d = new Date();
   return { month: d.getMonth() + 1, year: d.getFullYear() };
 }
+
 function formatMoney(v) {
   const n = Number(v || 0);
   return n.toLocaleString("vi-VN");
 }
+
 function toMonthYear(dateStr) {
   const d = new Date(dateStr);
   return { month: d.getMonth() + 1, year: d.getFullYear() };
@@ -24,21 +27,23 @@ function clamp(n, min, max) {
   return Math.min(max, Math.max(min, n));
 }
 
-/** ✅ format input có dấu phẩy, chỉ cho phép số */
+/** format input có dấu phẩy, chỉ cho phép số */
 function formatNumberInput(value) {
-  const digits = String(value ?? "").replace(/[^\d]/g, "");
+  const digits = String(value ?? "").replace(/\D/g, "");
   if (!digits) return "";
   return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
-/** ✅ bỏ dấu phẩy để parse number */
+
+/** bỏ dấu phẩy để parse number */
 function unformatNumberInput(value) {
   return String(value ?? "").replace(/,/g, "");
 }
 
-/** ✅ caret helpers (giữ con trỏ không bị nhảy) */
+/** caret helpers (giữ con trỏ không bị nhảy) */
 function countDigitsBeforePos(str, pos) {
   return (str.slice(0, pos).match(/\d/g) || []).length;
 }
+
 function posAfterNDigits(formattedStr, nDigits) {
   if (nDigits <= 0) return 0;
   let count = 0;
@@ -74,6 +79,7 @@ function StatusBanner({ budget, actual }) {
   let cls = "budBanner budBanner--ok";
   let label = "Trong ngưỡng";
   let pill = "ok";
+
   if (percent >= 100) {
     cls = "budBanner budBanner--danger";
     label = "Vượt ngân sách";
@@ -100,6 +106,7 @@ function StatusBanner({ budget, actual }) {
 
 function ProgressRing({ percent = 0 }) {
   const p = clamp(Number(percent || 0), 0, 100);
+
   return (
     <div className="budRing" aria-label={`Budget usage ${p}%`}>
       <div className="budRing__inner">
@@ -123,9 +130,9 @@ export default function BudgetsPage() {
 
   const [budget, setBudget] = useState(null);
   const [draftAmount, setDraftAmount] = useState("");
+  const [isComposing, setIsComposing] = useState(false);
 
   const budgetInputRef = useRef(null);
-
   const [expenses, setExpenses] = useState([]);
 
   const actual = useMemo(() => {
@@ -150,8 +157,36 @@ export default function BudgetsPage() {
 
   const handleDraftAmountChange = (e) => {
     const raw = e.target.value;
-    const caret = e.target.selectionStart ?? raw.length;
 
+    // Khi đang dùng IME/bàn phím tiếng Việt thì chưa format ngay
+    if (isComposing) {
+      setDraftAmount(raw);
+      return;
+    }
+
+    const caret = e.target.selectionStart ?? raw.length;
+    const digitsBefore = countDigitsBeforePos(raw, caret);
+    const formatted = formatNumberInput(raw);
+
+    setDraftAmount(formatted);
+
+    requestAnimationFrame(() => {
+      const el = budgetInputRef.current;
+      if (!el) return;
+      const nextCaret = posAfterNDigits(formatted, digitsBefore);
+      el.setSelectionRange(nextCaret, nextCaret);
+    });
+  };
+
+  const handleCompositionStart = () => {
+    setIsComposing(true);
+  };
+
+  const handleCompositionEnd = (e) => {
+    setIsComposing(false);
+
+    const raw = e.target.value;
+    const caret = e.target.selectionStart ?? raw.length;
     const digitsBefore = countDigitsBeforePos(raw, caret);
     const formatted = formatNumberInput(raw);
 
@@ -168,6 +203,7 @@ export default function BudgetsPage() {
   async function load() {
     setLoading(true);
     setError("");
+
     try {
       const [exps, b] = await Promise.all([fetchExpenses(), fetchBudgetByMonthYear(month, year)]);
       setExpenses(exps || []);
@@ -183,7 +219,6 @@ export default function BudgetsPage() {
         null;
 
       setBudget(normalized ? { ...normalized, limit_amount: amt } : null);
-
       setDraftAmount(amt !== null && amt !== undefined ? formatNumberInput(String(amt)) : "");
     } catch (err) {
       const msg =
@@ -214,6 +249,7 @@ export default function BudgetsPage() {
     }
 
     setSaving(true);
+
     try {
       const res = await upsertBudget({
         month: Number(month),
@@ -232,7 +268,6 @@ export default function BudgetsPage() {
         n;
 
       setBudget(normalized ? { ...normalized, limit_amount: amt } : { month, year, limit_amount: amt });
-
       setDraftAmount(formatNumberInput(String(amt)));
     } catch (err) {
       const msg =
@@ -260,16 +295,16 @@ export default function BudgetsPage() {
   return (
     <div className="budPage">
       <div className="dashContainer budContainer">
-        {/* HERO */}
         <div className="budHero">
           <div className="budHero__left">
             <div>
               <div className="budHero__title">
-                <span className="dashHeader__wave">💸</span>{" "}
-                Ngân sách <span className="budHero__grad">thông minh</span>{" "}
+                <span className="dashHeader__wave">💸</span> Ngân sách{" "}
+                <span className="budHero__grad">thông minh</span>
               </div>
               <div className="budHero__sub">
-                Thiết lập ngân sách theo tháng, theo dõi <b>Budget vs Chi tiêu</b>, nhận cảnh báo sớm khi sắp vượt ngưỡng.
+                Thiết lập ngân sách theo tháng, theo dõi <b>Budget vs Chi tiêu</b>, nhận cảnh báo sớm khi
+                sắp vượt ngưỡng.
               </div>
             </div>
 
@@ -291,7 +326,6 @@ export default function BudgetsPage() {
 
         {error ? <div className="budAlert budAlert--danger">{error}</div> : null}
 
-        {/* EDITOR (glass) */}
         <div className="budEditor">
           <div className="budEditor__group">
             <label className="budLabel">Month</label>
@@ -324,6 +358,8 @@ export default function BudgetsPage() {
               placeholder="Ví dụ: 3,000,000"
               value={draftAmount}
               onChange={handleDraftAmountChange}
+              onCompositionStart={handleCompositionStart}
+              onCompositionEnd={handleCompositionEnd}
               inputMode="numeric"
             />
 
@@ -331,16 +367,19 @@ export default function BudgetsPage() {
               {saving ? "Saving…" : budget ? "Cập nhật" : "Tạo mới"}
             </button>
 
-            <button className="btn btn--secondary" onClick={onResetDraft} disabled={saving || loading} type="button">
+            <button
+              className="btn btn--secondary"
+              onClick={onResetDraft}
+              disabled={saving || loading}
+              type="button"
+            >
               Cài lại
             </button>
           </div>
         </div>
 
-        {/* STATUS */}
         <StatusBanner budget={budget} actual={actual} />
 
-        {/* BODY */}
         {loading ? (
           <div className="budLoading">
             <div className="skeleton skeleton--hero" />
@@ -353,7 +392,6 @@ export default function BudgetsPage() {
         ) : (
           <>
             <div className="budGrid">
-              {/* KPI */}
               <div className="budCard budCard--purple">
                 <div className="budCard__label">Ngân sách tháng</div>
                 <div className="budCard__value">
@@ -378,7 +416,6 @@ export default function BudgetsPage() {
                 <div className="budCard__hint">Buffer cho chi phí phát sinh</div>
               </div>
 
-              {/* Ring + tips */}
               <div className="budPanel">
                 <div className="budPanel__head">
                   <div className="budPanel__title">
@@ -417,14 +454,15 @@ export default function BudgetsPage() {
               </div>
             </div>
 
-            {/* Summary table */}
             <div className="budTableCard">
               <div className="budTableCard__head">
                 <div>
                   <div className="budTableCard__title">
                     <AppIcon name="pin" size={18} /> Tóm tắt kỳ
                   </div>
-                  <div className="budTableCard__sub">Một dòng nhìn ra trạng thái tài chính của {periodLabel}.</div>
+                  <div className="budTableCard__sub">
+                    Một dòng nhìn ra trạng thái tài chính của {periodLabel}.
+                  </div>
                 </div>
                 <div className="budTableCard__meta">
                   <Pill tone="neutral">Period: {periodLabel}</Pill>
